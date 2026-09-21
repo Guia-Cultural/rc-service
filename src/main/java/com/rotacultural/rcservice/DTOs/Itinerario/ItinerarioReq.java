@@ -1,19 +1,30 @@
 package com.rotacultural.rcservice.DTOs.Itinerario;
 
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.time.LocalDate;
+
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class ItinerarioReq {
-    private long tripId;
-    private Date dia;
-    private long locId;
+    @NotNull
+    @Positive
+    private Long tripId;
+
+    @NotNull
+    private LocalDate dia;
+
+    @NotNull
+    @Positive
+    private Long locId;
+
     @Size(max = 500)
     private String descricao;
 }

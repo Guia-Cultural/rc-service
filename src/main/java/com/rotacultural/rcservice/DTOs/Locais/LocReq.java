@@ -43,21 +43,17 @@ public class LocReq {
     @Size(max = 100)
     private String pais;
 
-    @Column(precision = 10, scale = 7)
     private BigDecimal latitude;
 
-    @Column(precision = 10, scale = 7)
     private BigDecimal longitude;
 
     @NotBlank
     @Size(max = 150)
     private String tempoAberto;
 
-    @Enumerated(EnumType.STRING)
     private Preco preco;
 
     private long userId;
 
-    @Enumerated(EnumType.STRING)
     private Status status;
 }

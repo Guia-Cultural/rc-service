@@ -18,9 +18,7 @@ public class FeedbacksResp {
     private long id;
     private long userId;
     private long locId;
-    @NotNull
-    @Min(0)
-    @Max(5)
+
     private Double avaliacao;
 
     @Size(max = 500)

@@ -15,27 +15,11 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserResp {
-    private long id;
-
-    @Size(max = 150)
-    @NotBlank
+    private Long id;
     private String nome;
-
-    @Size(max = 150)
-    @NotBlank
     private String email;
-
-    @NotBlank
-    private String senha;
-
-    @Size(max = 11)
     private String cep;
-
-    @Enumerated(EnumType.STRING)
     private Role role;
-
-    @Size(max = 500)
     private String bio;
-
-    private LocalDateTime dataCreated;
+    private LocalDateTime dataCriacao;
 }
