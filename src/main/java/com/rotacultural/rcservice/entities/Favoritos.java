@@ -27,6 +27,6 @@ public class Favoritos {
     private Locais locais;
 
     @CreationTimestamp
-    @Column(name = "data_create")
+    @Column(name = "data_create", nullable = false, updatable = false)
     private LocalDateTime dataCadastro;
 }

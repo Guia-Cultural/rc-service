@@ -8,7 +8,7 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -70,7 +70,8 @@ public class Locais {
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    @CreatedDate
+    @CreationTimestamp
+    @Column(name = "data_create")
     private LocalDateTime dataCadastro;
 
 

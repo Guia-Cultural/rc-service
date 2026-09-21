@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
@@ -40,7 +41,7 @@ public class Usuarios {
     @Size(max = 500)
     private String bio;
 
-    @CreatedDate
+    @CreationTimestamp
     @Column(name = "data_created", nullable = false, updatable = false)
     private LocalDateTime dataCreated;
 }

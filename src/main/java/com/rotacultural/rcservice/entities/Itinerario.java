@@ -13,7 +13,7 @@ import java.util.Date;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Intinerario {
+public class Itinerario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idIntinerario;

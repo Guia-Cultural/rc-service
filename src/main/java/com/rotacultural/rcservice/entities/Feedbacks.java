@@ -8,6 +8,7 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
@@ -37,7 +38,8 @@ public class Feedbacks {
     @Size(max = 500)
     private String comentario;
 
-    @CreatedDate
+    @CreationTimestamp
+    @Column(name = "data_create")
     private LocalDateTime dataCriacao;
 
 }

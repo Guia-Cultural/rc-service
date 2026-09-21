@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -39,7 +40,7 @@ public class Viagens {
     @NotNull
     private BigDecimal orcamento;
 
-    @CreatedDate
+    @CreationTimestamp
     @Column(name = "data_created", nullable = false, updatable = false)
     private LocalDateTime dataCreated;
 
