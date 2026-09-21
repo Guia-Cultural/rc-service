@@ -12,6 +12,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -28,21 +29,20 @@ public class Viagens {
     private Usuarios usuario;
 
     @NotBlank
-    @Size(min = 15, max = 150)
+    @Size(max = 150)
     private String destino;
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, fallbackPatterns = { "d/M/yy", "dd.MM.yyyy" })
-    private LocalDateTime dataInicio;
+    private LocalDate dataInicio;
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, fallbackPatterns = { "d/M/yy", "dd.MM.yyyy" })
-    private LocalDateTime dataFim;
+    private LocalDate dataFim;
 
-    @NotNull
+    @Column(precision = 10, scale = 2)
     private BigDecimal orcamento;
 
     @CreationTimestamp
-    @Column(name = "data_created", nullable = false, updatable = false)
-    private LocalDateTime dataCreated;
-
+    @Column(name = "data_create", nullable = false, updatable = false)
+    private LocalDateTime dataCriacao;
 
 }

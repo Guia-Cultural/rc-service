@@ -23,10 +23,10 @@ public class Favoritos {
 
     @Id
     @ManyToOne
-    @JoinColumn(name = "idloc")
+    @JoinColumn(name = "idLoc")
     private Locais locais;
 
     @CreationTimestamp
     @Column(name = "data_create", nullable = false, updatable = false)
-    private LocalDateTime dataCadastro;
+    private LocalDateTime dataCriacao;
 }

@@ -21,7 +21,7 @@ public class Categorias {
     private Long idCat;
 
     @NotBlank
-    @Size(min = 1, max = 75)
+    @Size(max = 75)
     private String nome;
 
 }

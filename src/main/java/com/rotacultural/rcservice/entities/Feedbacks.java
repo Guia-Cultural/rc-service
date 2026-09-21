@@ -22,12 +22,12 @@ public class Feedbacks {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idFeed;
 
-    @ManyToOne
-    @JoinColumn(name = "idUser")
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "idUser", nullable = false)
     private Usuarios usuario;
 
-    @ManyToOne
-    @JoinColumn(name = "idLoc")
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "idLoc", nullable = false)
     private Locais locais;
 
     @NotNull
@@ -39,7 +39,7 @@ public class Feedbacks {
     private String comentario;
 
     @CreationTimestamp
-    @Column(name = "data_create")
+    @Column(name = "data_create", nullable = false, updatable = false)
     private LocalDateTime dataCriacao;
 
 }

@@ -7,7 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Entity
 @Data
@@ -16,18 +16,18 @@ import java.util.Date;
 public class Itinerario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idIntinerario;
+    private Long idItinerario;
 
-    @ManyToOne
-    @JoinColumn(name = "idTrip")
-    private Viagens viagens;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "idTrip", nullable = false)
+    private Viagens viagem;
 
     @NotNull
-    private Date dia;
+    private LocalDate dia;
 
-    @ManyToOne
-    @JoinColumn(name = "idLoc")
-    private Locais locais;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "idLoc", nullable = false)
+    private Locais local;
 
     @Size(max = 500)
     private String descricao;

@@ -6,6 +6,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Table(
+        name = "preferencias",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = {"idTrip", "idCat"})
+        }
+)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

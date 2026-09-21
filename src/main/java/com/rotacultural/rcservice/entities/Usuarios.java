@@ -2,6 +2,7 @@ package com.rotacultural.rcservice.entities;
 
 import com.rotacultural.rcservice.entities.enums.Role;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -19,17 +20,20 @@ import java.time.LocalDateTime;
 public class Usuarios {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long idUser;
+    private Long idUser;
 
     @Size(max = 150)
     @NotBlank
     private String nome;
 
-    @Size(max = 150)
     @NotBlank
+    @Email
+    @Size(max = 150)
+    @Column(nullable = false, unique = true)
     private String email;
 
     @NotBlank
+    @Column(length = 255, nullable = false)
     private String senha;
 
     @Size(max = 11)
@@ -42,6 +46,6 @@ public class Usuarios {
     private String bio;
 
     @CreationTimestamp
-    @Column(name = "data_created", nullable = false, updatable = false)
-    private LocalDateTime dataCreated;
+    @Column(name = "data_create", nullable = false, updatable = false)
+    private LocalDateTime dataCriacao;
 }

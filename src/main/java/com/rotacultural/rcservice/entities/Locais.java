@@ -50,10 +50,10 @@ public class Locais {
     @Size(max = 100)
     private String pais;
 
-    @Column(precision = 10, scale = 7)
+    @Column(precision = 10, scale = 8)
     private BigDecimal latitude;
 
-    @Column(precision = 10, scale = 7)
+    @Column(precision = 10, scale = 8)
     private BigDecimal longitude;
 
     @NotBlank
@@ -63,9 +63,9 @@ public class Locais {
     @Enumerated(EnumType.STRING)
     private Preco preco;
 
-    @ManyToOne
-    @JoinColumn(name ="idUser")
-    private Usuarios usuario;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "criado_por", nullable = false)
+    private Usuarios criadoPor;
 
     @Enumerated(EnumType.STRING)
     private Status status;
