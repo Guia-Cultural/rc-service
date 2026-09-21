@@ -2,10 +2,9 @@ package com.rotacultural.rcservice.DTOs.Locais;
 
 import com.rotacultural.rcservice.entities.enums.Preco;
 import com.rotacultural.rcservice.entities.enums.Status;
-import jakarta.persistence.Column;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -25,6 +24,8 @@ public class LocReq {
     @Size(max = 500)
     private String descricao;
 
+    @NotNull
+    @Positive
     private Long catId;
 
     @NotBlank
@@ -43,17 +44,23 @@ public class LocReq {
     @Size(max = 100)
     private String pais;
 
+    @NotNull
     private BigDecimal latitude;
 
+    @NotNull
     private BigDecimal longitude;
 
     @NotBlank
     @Size(max = 150)
     private String tempoAberto;
 
+    @NotNull
     private Preco preco;
 
-    private long userId;
+    @NotNull
+    @Positive
+    private Long userId;
 
+    @NotNull
     private Status status;
 }

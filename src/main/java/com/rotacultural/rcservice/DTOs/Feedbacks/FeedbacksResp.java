@@ -7,7 +7,6 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
 
@@ -20,8 +19,6 @@ public class FeedbacksResp {
     private long locId;
 
     private Double avaliacao;
-
-    @Size(max = 500)
     private String comentario;
 
 

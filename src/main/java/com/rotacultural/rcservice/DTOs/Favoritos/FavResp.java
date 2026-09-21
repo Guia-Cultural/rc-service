@@ -12,5 +12,5 @@ import java.time.LocalDateTime;
 public class FavResp {
     private Long userId;
     private Long locId;
-    private LocalDateTime dataCadastro;
+    private LocalDateTime dataCriacao;
 }

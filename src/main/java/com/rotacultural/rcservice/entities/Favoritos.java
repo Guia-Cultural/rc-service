@@ -1,9 +1,7 @@
 package com.rotacultural.rcservice.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
@@ -11,7 +9,8 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "favoritos")
 @IdClass(FavoritosId.class)
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class Favoritos {

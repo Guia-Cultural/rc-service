@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Data
 @AllArgsConstructor
@@ -13,9 +13,8 @@ import java.util.Date;
 public class ItinerarioResp {
     private long id;
     private long tripId;
-    private Date dia;
+    private LocalDate dia;
     private long locId;
-    @Size(max = 500)
     private String descricao;
 
 }

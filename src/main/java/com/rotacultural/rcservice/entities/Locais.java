@@ -5,16 +5,15 @@ import com.rotacultural.rcservice.entities.enums.Status;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class Locais {
@@ -53,7 +52,7 @@ public class Locais {
     @Column(precision = 10, scale = 8)
     private BigDecimal latitude;
 
-    @Column(precision = 10, scale = 8)
+    @Column(precision = 11, scale = 8)
     private BigDecimal longitude;
 
     @NotBlank
@@ -71,9 +70,8 @@ public class Locais {
     private Status status;
 
     @CreationTimestamp
-    @Column(name = "data_create")
-    private LocalDateTime dataCadastro;
-
+    @Column(name = "data_create", nullable = false, updatable = false)
+    private LocalDateTime dataCriacao;
 
 
 

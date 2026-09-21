@@ -1,5 +1,7 @@
 package com.rotacultural.rcservice.DTOs.Preferencias;
 
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,6 +10,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PrefReq {
-    private long tripId;
-    private long catId;
+    @NotNull
+    @Positive
+    private Long tripId;
+
+    @NotNull
+    @Positive
+    private Long catId;
 }

@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PrefResp {
-    private long id;
-    private long tripId;
-    private long catId;
+    private Long id;
+    private Long tripId;
+    private Long catId;
 }

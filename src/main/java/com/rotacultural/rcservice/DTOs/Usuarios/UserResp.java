@@ -1,10 +1,6 @@
 package com.rotacultural.rcservice.DTOs.Usuarios;
 
 import com.rotacultural.rcservice.entities.enums.Role;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

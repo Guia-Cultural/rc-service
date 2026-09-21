@@ -1,9 +1,7 @@
 package com.rotacultural.rcservice.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Table(
@@ -12,7 +10,8 @@ import lombok.NoArgsConstructor;
                 @UniqueConstraint(columnNames = {"idTrip", "idCat"})
         }
 )
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class Preferencias {
@@ -20,11 +19,11 @@ public class Preferencias {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idPref;
 
-    @ManyToOne
-    @JoinColumn(name = "idTrip")
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "idTrip", nullable = false)
     private Viagens viagens;
 
-    @ManyToOne
-    @JoinColumn(name = "idCat")
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "idCat", nullable = false)
     private Categorias categorias;
 }

@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -17,16 +18,11 @@ import java.time.LocalDateTime;
 public class TripResp {
     private Long id;
     private Long userId;
-    @NotBlank
-    @Size(min = 15, max = 150)
     private String destino;
-
-    private LocalDateTime dataInicio;
-
-    private LocalDateTime dataFim;
-
-    @NotNull
+    private LocalDate dataInicio;
+    private LocalDate dataFim;
     private BigDecimal orcamento;
-    private LocalDateTime dataCreated;
+    private LocalDateTime dataCriacao;
+
 
 }

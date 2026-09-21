@@ -1,9 +1,6 @@
 package com.rotacultural.rcservice.DTOs.Feedbacks;
 
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,8 +9,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class FeedbacksReq {
-    private long userId;
-    private long locId;
+    @NotNull
+    @Positive
+    private Long userId;
+
+    @NotNull
+    @Positive
+    private Long locId;
 
     @NotNull
     @Min(0)

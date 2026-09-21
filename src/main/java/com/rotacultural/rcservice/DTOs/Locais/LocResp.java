@@ -19,50 +19,18 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class LocResp {
     private Long id;
-
-    @NotBlank
-    @Size(max = 150)
     private String nome;
-
-    @NotBlank
-    @Size(max = 500)
     private String descricao;
-
     private Long catId;
-
-    @NotBlank
-    @Size(max = 150)
     private String endereco;
-
-    @NotBlank
-    @Size(max = 100)
     private String cidade;
-
-    @NotBlank
-    @Size(max = 150)
     private String estado;
-
-    @NotBlank
-    @Size(max = 100)
     private String pais;
-
-    @Column(precision = 10, scale = 7)
     private BigDecimal latitude;
-
-    @Column(precision = 10, scale = 7)
     private BigDecimal longitude;
-
-    @NotBlank
-    @Size(max = 150)
     private String tempoAberto;
-
-    @Enumerated(EnumType.STRING)
     private Preco preco;
-
-    private long userId;
-
-    @Enumerated(EnumType.STRING)
+    private Long userId;
     private Status status;
-
-    private LocalDateTime dataCadastro;
+    private LocalDateTime dataCriacao;
 }

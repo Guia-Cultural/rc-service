@@ -21,8 +21,10 @@ public class TripReq {
     @Size(max = 150)
     private String destino;
 
+    @NotNull
     private LocalDate dataInicio;
 
+    @NotNull
     private LocalDate dataFim;
 
     @NotNull
