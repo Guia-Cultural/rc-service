@@ -38,6 +38,7 @@ public class Usuarios {
     private String cep;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private Role role;
 
     @Size(max = 500)
