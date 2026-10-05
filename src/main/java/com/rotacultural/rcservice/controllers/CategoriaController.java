@@ -33,7 +33,7 @@ public class CategoriaController {
             return ResponseEntity.ok().body(categoriaService.getById(id));
         }
         catch(EntityNotFoundException e){
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
 
@@ -42,7 +42,7 @@ public class CategoriaController {
         try {
             return ResponseEntity.status(HttpStatus.OK).body(categoriaService.update(id, catReq));
         }catch(EntityNotFoundException e){
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
 
     }
@@ -50,9 +50,10 @@ public class CategoriaController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable long id){
         try {
-            return ResponseEntity.status(HttpStatus.OK).body(categoriaService.delete(id));
+            categoriaService.delete(id);
+            return ResponseEntity.noContent().build();
         }catch (EntityNotFoundException e){
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
 
     }

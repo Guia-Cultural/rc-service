@@ -33,7 +33,7 @@ public class UsuarioController {
         try{
             return ResponseEntity.ok().body(usuariosService.getById(id));
         }catch (EntityNotFoundException e){
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
 
     }
@@ -43,7 +43,7 @@ public class UsuarioController {
         try {
             return ResponseEntity.ok().body(usuariosService.getByCep(cep));
         }catch (EntityNotFoundException e){
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
 
@@ -52,7 +52,7 @@ public class UsuarioController {
         try {
             return ResponseEntity.ok().body(usuariosService.update(id, userReq));
         }catch (EntityNotFoundException e){
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
 
     }
@@ -63,8 +63,13 @@ public class UsuarioController {
             usuariosService.delete(id);
             return ResponseEntity.noContent().build();
         }catch (EntityNotFoundException e){
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
 
+    }
+
+    @GetMapping("/viagens")
+    public ResponseEntity<?> readByViagens(){
+        return ResponseEntity.ok().body(usuariosService.getAllTrip());
     }
 }

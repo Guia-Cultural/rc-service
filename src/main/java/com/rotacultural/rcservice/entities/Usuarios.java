@@ -9,6 +9,7 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Getter
@@ -47,4 +48,7 @@ public class Usuarios {
     @CreationTimestamp
     @Column(name = "data_create", nullable = false, updatable = false)
     private LocalDateTime dataCriacao;
+
+    @OneToMany(mappedBy = "usuario")
+    private List<Viagens> viagens;
 }

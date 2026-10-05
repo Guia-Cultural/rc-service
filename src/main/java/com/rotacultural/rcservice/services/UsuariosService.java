@@ -2,6 +2,7 @@ package com.rotacultural.rcservice.services;
 
 import com.rotacultural.rcservice.DTOs.Usuarios.UserReq;
 import com.rotacultural.rcservice.DTOs.Usuarios.UserResp;
+import com.rotacultural.rcservice.DTOs.Usuarios.UserRespTrip;
 import com.rotacultural.rcservice.entities.Usuarios;
 import com.rotacultural.rcservice.repositories.UsuariosRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -118,5 +119,22 @@ public class UsuariosService {
         }else {
             throw new EntityNotFoundException("Usuario não encontrado");
         }
+    }
+
+    public List<UserRespTrip> getAllTrip() {
+        List<Usuarios> usuarios = usuariosRepository.findAll();
+        List<UserRespTrip> userRespTrips = new ArrayList<>();
+        for (Usuarios usuario : usuarios) {
+            UserRespTrip userRespTrip = new UserRespTrip();
+            userRespTrip.setId(usuario.getIdUser());
+            userRespTrip.setNome(usuario.getNome());
+            userRespTrip.setEmail(usuario.getEmail());
+            userRespTrip.setCep(usuario.getCep());
+            userRespTrip.setBio(usuario.getBio());
+            userRespTrip.setRole(usuario.getRole());
+            userRespTrip.setViagens(usuario.getViagens());
+            userRespTrips.add(userRespTrip);
+        }
+        return userRespTrips;
     }
 }
