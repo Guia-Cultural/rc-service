@@ -19,15 +19,15 @@ public class Itinerary {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "idTrip", nullable = false)
-    private Trips viagem;
+    private Trips trip;
 
     @NotNull
-    private LocalDate dia;
+    private LocalDate day;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "idLoc", nullable = false)
-    private Places local;
+    private Places locale;
 
     @Size(max = 500)
-    private String descricao;
+    private String description;
 }

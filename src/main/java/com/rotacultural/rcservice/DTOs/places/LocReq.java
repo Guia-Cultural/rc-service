@@ -1,6 +1,6 @@
 package com.rotacultural.rcservice.DTOs.places;
 
-import com.rotacultural.rcservice.entities.enums.Priece;
+import com.rotacultural.rcservice.entities.enums.Price;
 import com.rotacultural.rcservice.entities.enums.Status;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -55,7 +55,7 @@ public class LocReq {
     private String tempoAberto;
 
     @NotNull
-    private Priece priece;
+    private Price price;
 
     @NotNull
     @Positive

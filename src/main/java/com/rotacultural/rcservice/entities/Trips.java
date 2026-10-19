@@ -22,21 +22,21 @@ public class Trips {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "idUser", nullable = false)
-    private Users usuario;
+    private Users user;
 
     @NotBlank
     @Size(max = 150)
-    private String destino;
+    private String destination;
 
-    private LocalDate dataInicio;
+    private LocalDate startDate;
 
-    private LocalDate dataFim;
+    private LocalDate endDate;
 
     @Column(precision = 10, scale = 2)
-    private BigDecimal orcamento;
+    private BigDecimal budget;
 
     @CreationTimestamp
-    @Column(name = "data_create", nullable = false, updatable = false)
-    private LocalDateTime dataCriacao;
+    @Column(name = "date_create", nullable = false, updatable = false)
+    private LocalDateTime dateCreate;
 
 }

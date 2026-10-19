@@ -11,8 +11,8 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class FavoritesId implements Serializable {
 
-    private Long usuario;
-    private Long locais;
+    private Long user;
+    private Long place;
 
 
 }

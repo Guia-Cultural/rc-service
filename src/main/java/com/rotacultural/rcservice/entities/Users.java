@@ -23,7 +23,7 @@ public class Users {
 
     @Size(max = 150)
     @NotBlank
-    private String nome;
+    private String name;
 
     @NotBlank
     @Email
@@ -33,7 +33,7 @@ public class Users {
 
     @NotBlank
     @Column(length = 255, nullable = false)
-    private String senha;
+    private String password;
 
     @Size(max = 11)
     private String cep;
@@ -46,9 +46,9 @@ public class Users {
     private String bio;
 
     @CreationTimestamp
-    @Column(name = "data_create", nullable = false, updatable = false)
-    private LocalDateTime dataCriacao;
+    @Column(name = "date_create", nullable = false, updatable = false)
+    private LocalDateTime dateCreate;
 
-    @OneToMany(mappedBy = "usuario")
-    private List<Trips> viagens;
+    @OneToMany(mappedBy = "users")
+    private List<Trips> trips;
 }

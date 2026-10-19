@@ -22,7 +22,7 @@ public class Feedbacks {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "idUser", nullable = false)
-    private Users usuario;
+    private Users user;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "idLoc", nullable = false)
@@ -31,13 +31,13 @@ public class Feedbacks {
     @NotNull
     @Min(0)
     @Max(5)
-    private Double avaliacao;
+    private Double assessment;
 
     @Size(max = 500)
-    private String comentario;
+    private String commentary;
 
     @CreationTimestamp
-    @Column(name = "data_create", nullable = false, updatable = false)
-    private LocalDateTime dataCriacao;
+    @Column(name = "date_create", nullable = false, updatable = false)
+    private LocalDateTime dateCreate;
 
 }

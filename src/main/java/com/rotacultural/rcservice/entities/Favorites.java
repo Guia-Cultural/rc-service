@@ -7,7 +7,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "favoritos")
+@Table(name = "favorites")
 @IdClass(FavoritesId.class)
 @Getter
 @Setter
@@ -18,14 +18,14 @@ public class Favorites {
     @Id
     @ManyToOne
     @JoinColumn(name = "idUser")
-    private Users usuario;
+    private Users user;
 
     @Id
     @ManyToOne
     @JoinColumn(name = "idLoc")
-    private Places places;
+    private Places place;
 
     @CreationTimestamp
-    @Column(name = "data_create", nullable = false, updatable = false)
-    private LocalDateTime dataCriacao;
+    @Column(name = "date_create", nullable = false, updatable = false)
+    private LocalDateTime dateCreate;
 }

@@ -1,6 +1,6 @@
 package com.rotacultural.rcservice.DTOs.places;
 
-import com.rotacultural.rcservice.entities.enums.Priece;
+import com.rotacultural.rcservice.entities.enums.Price;
 import com.rotacultural.rcservice.entities.enums.Status;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,7 +24,7 @@ public class LocResp {
     private BigDecimal latitude;
     private BigDecimal longitude;
     private String tempoAberto;
-    private Priece priece;
+    private Price price;
     private Long userId;
     private Status status;
     private LocalDateTime dataCriacao;

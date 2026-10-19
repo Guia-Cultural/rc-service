@@ -1,6 +1,6 @@
 package com.rotacultural.rcservice.entities.enums;
 
-public enum Priece {
+public enum Price {
     GRATUITO,
     BARATO,
     MODERADO,

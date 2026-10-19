@@ -1,6 +1,6 @@
 package com.rotacultural.rcservice.entities;
 
-import com.rotacultural.rcservice.entities.enums.Priece;
+import com.rotacultural.rcservice.entities.enums.Price;
 import com.rotacultural.rcservice.entities.enums.Status;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -23,31 +23,31 @@ public class Places {
 
     @NotBlank
     @Size(max = 150)
-    private String nome;
+    private String name;
 
     @NotBlank
     @Size(max = 500)
-    private String descricao;
+    private String description;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idCat")
-    private Categories categoria;
+    private Categories category;
 
     @NotBlank
     @Size(max = 150)
-    private String endereco;
+    private String address;
 
     @NotBlank
     @Size(max = 100)
-    private String cidade;
+    private String city;
 
     @NotBlank
     @Size(max = 150)
-    private String estado;
+    private String state;
 
     @NotBlank
     @Size(max = 100)
-    private String pais;
+    private String country;
 
     @Column(precision = 10, scale = 8)
     private BigDecimal latitude;
@@ -57,21 +57,21 @@ public class Places {
 
     @NotBlank
     @Size(max = 150)
-    private String tempoAberto;
+    private String businessHours;
 
     @Enumerated(EnumType.STRING)
-    private Priece priece;
+    private Price price;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "criado_por", nullable = false)
-    private Users criadoPor;
+    @JoinColumn(name = "create_by", nullable = false)
+    private Users createBy;
 
     @Enumerated(EnumType.STRING)
     private Status status;
 
     @CreationTimestamp
-    @Column(name = "data_create", nullable = false, updatable = false)
-    private LocalDateTime dataCriacao;
+    @Column(name = "date_create", nullable = false, updatable = false)
+    private LocalDateTime dateCreate;
 
 
 

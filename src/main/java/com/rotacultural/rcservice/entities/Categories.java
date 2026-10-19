@@ -21,6 +21,6 @@ public class Categories {
 
     @NotBlank
     @Size(max = 75)
-    private String nome;
+    private String name;
 
 }
