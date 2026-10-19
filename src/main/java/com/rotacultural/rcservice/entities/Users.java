@@ -49,6 +49,6 @@ public class Users {
     @Column(name = "date_create", nullable = false, updatable = false)
     private LocalDateTime dateCreate;
 
-    @OneToMany(mappedBy = "users")
+    @OneToMany(mappedBy = "user")
     private List<Trips> trips;
 }
