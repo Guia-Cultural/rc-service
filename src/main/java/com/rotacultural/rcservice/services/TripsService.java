@@ -25,26 +25,26 @@ public class TripsService {
     public TripResp create(TripReq tripReq) {
         Trips trips = new Trips();
         Users users = usersRepository.findById(tripReq.getUserId()).orElseThrow(() -> new EntityNotFoundException("Usuario não encontrado"));
-        trips.setUsuario(users);
-        trips.setDestino(tripReq.getDestino());
-        if(tripReq.getDataInicio() != null) {
-            trips.setDataInicio(tripReq.getDataInicio());
+        trips.setUser(users);
+        trips.setDestination(tripReq.getDestination());
+        if(tripReq.getStartDate() != null) {
+            trips.setStartDate(tripReq.getStartDate());
         }
-        if(tripReq.getDataFim() != null && tripReq.getDataFim().isBefore(tripReq.getDataInicio())) {
-            trips.setDataFim(tripReq.getDataFim());
+        if(tripReq.getEndDate() != null && tripReq.getEndDate().isBefore(tripReq.getStartDate())) {
+            trips.setEndDate(tripReq.getEndDate());
         }else {
             throw new IllegalArgumentException("A data final deve ser anterior à data inicial");
         }
 
-        trips.setOrcamento(tripReq.getOrcamento());
+        trips.setBudget(tripReq.getBudget());
         tripsRepository.save(trips);
 
         TripResp tripResp = new TripResp();
         tripResp.setUserId(users.getIdUser());
-        tripResp.setDestino(tripReq.getDestino());
-        tripResp.setDataInicio(trips.getDataInicio());
-        tripResp.setDataFim(trips.getDataFim());
-        tripResp.setOrcamento(trips.getOrcamento());
+        tripResp.setDestination(tripReq.getDestination());
+        tripResp.setStartDate(trips.getStartDate());
+        tripResp.setEndDate(trips.getEndDate());
+        tripResp.setBudget(trips.getBudget());
 
         return tripResp;
 
@@ -55,11 +55,11 @@ public class TripsService {
         List<TripResp> tripResp = new ArrayList<>();
         for (Trips viagen : viagens) {
             TripResp tripResp1 = new TripResp();
-            tripResp1.setUserId(viagen.getUsuario().getIdUser());
-            tripResp1.setDestino(viagen.getDestino());
-            tripResp1.setDataInicio(viagen.getDataInicio());
-            tripResp1.setDataFim(viagen.getDataFim());
-            tripResp1.setOrcamento(viagen.getOrcamento());
+            tripResp1.setUserId(viagen.getUser().getIdUser());
+            tripResp1.setDestination(viagen.getDestination());
+            tripResp1.setStartDate(viagen.getStartDate());
+            tripResp1.setEndDate(viagen.getEndDate());
+            tripResp1.setBudget(viagen.getBudget());
             tripResp.add(tripResp1);
         }
         return tripResp;
@@ -69,27 +69,27 @@ public class TripsService {
         Trips viagem = tripsRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Viagem não encontrada"));
         TripResp tripResp = new TripResp();
         tripResp.setId(viagem.getIdTrip());
-        tripResp.setDestino(viagem.getDestino());
-        tripResp.setDataInicio(viagem.getDataInicio());
-        tripResp.setDataFim(viagem.getDataFim());
-        tripResp.setOrcamento(viagem.getOrcamento());
+        tripResp.setDestination(viagem.getDestination());
+        tripResp.setStartDate(viagem.getStartDate());
+        tripResp.setEndDate(viagem.getEndDate());
+        tripResp.setBudget(viagem.getBudget());
         return tripResp;
     }
 
     public TripResp update(long id, TripReq tripReq) {
         Trips viagem = tripsRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Viagem não encontrada"));
-        viagem.setUsuario(usersRepository.findById(tripReq.getUserId()).orElseThrow(() -> new EntityNotFoundException("Usuario não encontrado")));
-        viagem.setDestino(tripReq.getDestino());
-        viagem.setDataInicio(tripReq.getDataInicio());
-        viagem.setDataFim(tripReq.getDataFim());
-        viagem.setOrcamento(tripReq.getOrcamento());
+        viagem.setUser(usersRepository.findById(tripReq.getUserId()).orElseThrow(() -> new EntityNotFoundException("Usuario não encontrado")));
+        viagem.setDestination(tripReq.getDestination());
+        viagem.setStartDate(tripReq.getStartDate());
+        viagem.setEndDate(tripReq.getEndDate());
+        viagem.setBudget(tripReq.getBudget());
         tripsRepository.save(viagem);
         TripResp tripResp = new TripResp();
         tripResp.setId(id);
-        tripResp.setDestino(viagem.getDestino());
-        tripResp.setDataInicio(viagem.getDataInicio());
-        tripResp.setDataFim(viagem.getDataFim());
-        tripResp.setOrcamento(viagem.getOrcamento());
+        tripResp.setDestination(viagem.getDestination());
+        tripResp.setStartDate(viagem.getStartDate());
+        tripResp.setEndDate(viagem.getEndDate());
+        tripResp.setBudget(viagem.getBudget());
         return tripResp;
     }
 

@@ -21,9 +21,9 @@ public class UsersService {
 
     public UserResp create(UserReq userReq) {
         Users usuario = new Users();
-        usuario.setNome(userReq.getNome());
+        usuario.setName(userReq.getName());
         usuario.setEmail(userReq.getEmail());
-        usuario.setSenha(userReq.getSenha());
+        usuario.setPassword(userReq.getPassword());
         if(userReq.getCep() != null && !userReq.getCep().isEmpty()){
             usuario.setCep(userReq.getCep());
         }
@@ -35,12 +35,12 @@ public class UsersService {
 
         UserResp userResp = new UserResp();
         userResp.setId(userResp.getId());
-        userResp.setNome(userReq.getNome());
+        userResp.setName(userReq.getName());
         userResp.setEmail(userReq.getEmail());
         userResp.setCep(userReq.getCep());
         userResp.setBio(userReq.getBio());
         userResp.setRole(userReq.getRole());
-        userResp.setDataCriacao(usuario.getDataCriacao());
+        userResp.setDateCreate(usuario.getDateCreate());
         return userResp;
     }
 
@@ -50,7 +50,7 @@ public class UsersService {
         for (Users usuario : usuarios) {
             UserResp userResp = new UserResp();
             userResp.setId(usuario.getIdUser());
-            userResp.setNome(usuario.getNome());
+            userResp.setName(usuario.getName());
             userResp.setEmail(usuario.getEmail());
             userResp.setCep(usuario.getCep());
             userResp.setBio(usuario.getBio());
@@ -65,7 +65,7 @@ public class UsersService {
         Users usuario = usersRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Usuario não encontrado"));
         UserResp userResp = new UserResp();
         userResp.setId(usuario.getIdUser());
-        userResp.setNome(usuario.getNome());
+        userResp.setName(usuario.getName());
         userResp.setEmail(usuario.getEmail());
         userResp.setCep(usuario.getCep());
         userResp.setBio(usuario.getBio());
@@ -82,7 +82,7 @@ public class UsersService {
         for (Users usuario : usuarios) {
             UserResp userResp = new UserResp();
             userResp.setId(usuario.getIdUser());
-            userResp.setNome(usuario.getNome());
+            userResp.setName(usuario.getName());
             userResp.setEmail(usuario.getEmail());
             userResp.setCep(usuario.getCep());
             userResp.setBio(usuario.getBio());
@@ -94,7 +94,7 @@ public class UsersService {
 
     public UserResp update(long id, UserReq userReq) {
         Users usuario = usersRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Usuario não encontrado"));
-        usuario.setNome(userReq.getNome());
+        usuario.setName(userReq.getName());
         usuario.setEmail(userReq.getEmail());
         usuario.setCep(userReq.getCep());
         usuario.setBio(userReq.getBio());
@@ -102,12 +102,12 @@ public class UsersService {
         usersRepository.save(usuario);
         UserResp userResp = new UserResp();
         userResp.setId(usuario.getIdUser());
-        userResp.setNome(usuario.getNome());
+        userResp.setName(usuario.getName());
         userResp.setEmail(usuario.getEmail());
         userResp.setCep(usuario.getCep());
         userResp.setBio(usuario.getBio());
         userResp.setRole(usuario.getRole());
-        userResp.setDataCriacao(usuario.getDataCriacao());
+        userResp.setDateCreate(usuario.getDateCreate());
         return userResp;
     }
 
@@ -125,12 +125,12 @@ public class UsersService {
         for (Users usuario : usuarios) {
             UserRespTrip userRespTrip = new UserRespTrip();
             userRespTrip.setId(usuario.getIdUser());
-            userRespTrip.setNome(usuario.getNome());
+            userRespTrip.setName(usuario.getName());
             userRespTrip.setEmail(usuario.getEmail());
             userRespTrip.setCep(usuario.getCep());
             userRespTrip.setBio(usuario.getBio());
             userRespTrip.setRole(usuario.getRole());
-            userRespTrip.setViagens(usuario.getViagens());
+            userRespTrip.setTrips(usuario.getTrips());
             userRespTrips.add(userRespTrip);
         }
         return userRespTrips;

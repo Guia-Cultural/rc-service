@@ -1,7 +1,7 @@
 package com.rotacultural.rcservice.controllers;
 
 import com.rotacultural.rcservice.DTOs.Categories.CatReq;
-import com.rotacultural.rcservice.services.CategorieService;
+import com.rotacultural.rcservice.services.CategoryService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -11,26 +11,26 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/categoria")
 public class CategoryController {
-    private final CategorieService categorieService;
+    private final CategoryService categoryService;
 
-    public CategoryController(CategorieService categorieService) {
-        this.categorieService = categorieService;
+    public CategoryController(CategoryService categoryService) {
+        this.categoryService = categoryService;
     }
 
     @PostMapping
     public ResponseEntity<?> create(@RequestBody @Valid CatReq catReq) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(categorieService.create(catReq));
+        return ResponseEntity.status(HttpStatus.CREATED).body(categoryService.create(catReq));
     }
 
     @GetMapping
     public ResponseEntity<?> readAll(){
-        return ResponseEntity.ok().body(categorieService.getAll());
+        return ResponseEntity.ok().body(categoryService.getAll());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> readById(@PathVariable Long id){
         try{
-            return ResponseEntity.ok().body(categorieService.getById(id));
+            return ResponseEntity.ok().body(categoryService.getById(id));
         }
         catch(EntityNotFoundException e){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
@@ -40,7 +40,7 @@ public class CategoryController {
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable long id, @RequestBody @Valid CatReq catReq) {
         try {
-            return ResponseEntity.status(HttpStatus.OK).body(categorieService.update(id, catReq));
+            return ResponseEntity.status(HttpStatus.OK).body(categoryService.update(id, catReq));
         }catch(EntityNotFoundException e){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
@@ -50,7 +50,7 @@ public class CategoryController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable long id){
         try {
-            categorieService.delete(id);
+            categoryService.delete(id);
             return ResponseEntity.noContent().build();
         }catch (EntityNotFoundException e){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
