@@ -22,11 +22,11 @@ public class Feedbacks {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "idUser", nullable = false)
-    private Usuarios usuario;
+    private Users usuario;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "idLoc", nullable = false)
-    private Locais locais;
+    private Places places;
 
     @NotNull
     @Min(0)
