@@ -14,18 +14,18 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class LocResp {
     private Long id;
-    private String nome;
-    private String descricao;
+    private String name;
+    private String description;
     private Long catId;
-    private String endereco;
-    private String cidade;
-    private String estado;
-    private String pais;
+    private String address;
+    private String city;
+    private String state;
+    private String country;
     private BigDecimal latitude;
     private BigDecimal longitude;
-    private String tempoAberto;
+    private String businessHours;
     private Price price;
     private Long userId;
     private Status status;
-    private LocalDateTime dataCriacao;
+    private LocalDateTime dateCreate;
 }

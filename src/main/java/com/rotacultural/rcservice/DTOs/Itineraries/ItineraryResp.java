@@ -12,8 +12,8 @@ import java.time.LocalDate;
 public class ItineraryResp {
     private long id;
     private long tripId;
-    private LocalDate dia;
+    private LocalDate day;
     private long locId;
-    private String descricao;
+    private String description;
 
 }

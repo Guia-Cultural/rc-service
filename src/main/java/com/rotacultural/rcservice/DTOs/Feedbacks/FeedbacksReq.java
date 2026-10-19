@@ -20,8 +20,8 @@ public class FeedbacksReq {
     @NotNull
     @Min(0)
     @Max(5)
-    private Double avaliacao;
+    private Double assessment;
 
     @Size(max = 500)
-    private String comentario;
+    private String commentary;
 }

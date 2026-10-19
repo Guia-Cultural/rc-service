@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 public class UserReq {
     @Size(max = 150)
     @NotBlank
-    private String nome;
+    private String name;
 
     @NotBlank
     @Email
@@ -24,7 +24,7 @@ public class UserReq {
 
     @NotBlank
     @Size(min = 8, max = 100)
-    private String senha;
+    private String password;
 
     @Size(max = 11)
     private String cep;

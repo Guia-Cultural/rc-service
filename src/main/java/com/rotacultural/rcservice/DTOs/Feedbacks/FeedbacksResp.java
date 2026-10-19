@@ -18,9 +18,9 @@ public class FeedbacksResp {
     private long userId;
     private long locId;
 
-    private Double avaliacao;
-    private String comentario;
+    private Double assessment;
+    private String commentary;
 
 
-    private LocalDateTime dataCriacao;
+    private LocalDateTime dateCreate;
 }

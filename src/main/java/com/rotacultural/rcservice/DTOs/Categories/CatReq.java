@@ -12,5 +12,5 @@ import lombok.NoArgsConstructor;
 public class CatReq {
     @NotBlank
     @Size(min = 1, max = 75)
-    private String nome;
+    private String name;
 }

@@ -19,12 +19,12 @@ public class ItineraryReq {
     private Long tripId;
 
     @NotNull
-    private LocalDate dia;
+    private LocalDate day;
 
     @NotNull
     @Positive
     private Long locId;
 
     @Size(max = 500)
-    private String descricao;
+    private String description;
 }

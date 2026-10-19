@@ -18,11 +18,11 @@ import java.math.BigDecimal;
 public class LocReq {
     @NotBlank
     @Size(max = 150)
-    private String nome;
+    private String name;
 
     @NotBlank
     @Size(max = 500)
-    private String descricao;
+    private String description;
 
     @NotNull
     @Positive
@@ -30,19 +30,19 @@ public class LocReq {
 
     @NotBlank
     @Size(max = 150)
-    private String endereco;
+    private String address;
 
     @NotBlank
     @Size(max = 100)
-    private String cidade;
+    private String city;
 
     @NotBlank
     @Size(max = 150)
-    private String estado;
+    private String state;
 
     @NotBlank
     @Size(max = 100)
-    private String pais;
+    private String country;
 
     @NotNull
     private BigDecimal latitude;
@@ -52,7 +52,7 @@ public class LocReq {
 
     @NotBlank
     @Size(max = 150)
-    private String tempoAberto;
+    private String businessHours;
 
     @NotNull
     private Price price;

@@ -14,11 +14,11 @@ import java.util.List;
 @NoArgsConstructor
 public class UserRespTrip {
     private Long id;
-    private String nome;
+    private String name;
     private String email;
     private String cep;
     private Role role;
     private String bio;
-    private LocalDateTime dataCriacao;
-    private List<Trips> viagens;
+    private LocalDateTime dateCreate;
+    private List<Trips> trips;
 }

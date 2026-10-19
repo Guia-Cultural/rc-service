@@ -14,11 +14,11 @@ import java.time.LocalDateTime;
 public class TripResp {
     private Long id;
     private Long userId;
-    private String destino;
-    private LocalDate dataInicio;
-    private LocalDate dataFim;
-    private BigDecimal orcamento;
-    private LocalDateTime dataCriacao;
+    private String destination;
+    private LocalDate startDate;
+    private LocalDate endDate;
+    private BigDecimal budget;
+    private LocalDateTime dateCreate;
 
 
 }

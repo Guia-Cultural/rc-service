@@ -19,15 +19,15 @@ public class TripReq {
 
     @NotBlank
     @Size(max = 150)
-    private String destino;
+    private String destination;
 
     @NotNull
-    private LocalDate dataInicio;
+    private LocalDate startDate;
 
     @NotNull
-    private LocalDate dataFim;
+    private LocalDate endDate;
 
     @NotNull
     @PositiveOrZero
-    private BigDecimal orcamento;
+    private BigDecimal budget;
 }
