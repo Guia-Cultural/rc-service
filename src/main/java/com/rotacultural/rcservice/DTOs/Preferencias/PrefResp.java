@@ -1,5 +1,7 @@
 package com.rotacultural.rcservice.DTOs.Preferencias;
 
+import com.rotacultural.rcservice.entities.Categorias;
+import com.rotacultural.rcservice.entities.Viagens;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,6 +11,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class PrefResp {
     private Long id;
-    private Long tripId;
-    private Long catId;
+    private Viagens viagens;
+    private Categorias categorias;
 }
