@@ -4,9 +4,13 @@ import com.rotacultural.rcservice.DTOs.Users.UserReq;
 import com.rotacultural.rcservice.DTOs.Users.UserResp;
 import com.rotacultural.rcservice.DTOs.Users.UserRespTrip;
 import com.rotacultural.rcservice.entities.Users;
+import com.rotacultural.rcservice.entities.enums.Role;
 import com.rotacultural.rcservice.repositories.UsersRepository;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,33 +18,62 @@ import java.util.List;
 @Service
 public class UsersService {
     private final UsersRepository usersRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UsersService(UsersRepository usersRepository) {
+    public UsersService(
+            UsersRepository usersRepository,
+            PasswordEncoder passwordEncoder
+    ) {
         this.usersRepository = usersRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public UserResp create(UserReq userReq) {
+
+        // Impede cadastro público de administradores
+        if (userReq.getRole() != Role.NATIVO &&
+                userReq.getRole() != Role.USUARIO) {
+
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Tipo de usuário inválido para cadastro"
+            );
+        }
+
         Users usuario = new Users();
+
         usuario.setName(userReq.getName());
         usuario.setEmail(userReq.getEmail());
-        usuario.setPassword(userReq.getPassword());
-        if(userReq.getCep() != null && !userReq.getCep().isEmpty()){
+
+        // Armazena a senha com hash BCrypt
+        usuario.setPassword(
+                passwordEncoder.encode(userReq.getPassword())
+        );
+
+        if (userReq.getCep() != null &&
+                !userReq.getCep().isEmpty()) {
             usuario.setCep(userReq.getCep());
         }
+
         usuario.setRole(userReq.getRole());
-        if (userReq.getBio() != null && !userReq.getBio().isEmpty()){
+
+        if (userReq.getBio() != null &&
+                !userReq.getBio().isEmpty()) {
             usuario.setBio(userReq.getBio());
         }
-        usersRepository.save(usuario);
+
+        usuario = usersRepository.save(usuario);
 
         UserResp userResp = new UserResp();
-        userResp.setId(userResp.getId());
-        userResp.setName(userReq.getName());
-        userResp.setEmail(userReq.getEmail());
-        userResp.setCep(userReq.getCep());
-        userResp.setBio(userReq.getBio());
-        userResp.setRole(userReq.getRole());
+
+        userResp.setId(usuario.getIdUser());
+        userResp.setName(usuario.getName());
+        userResp.setEmail(usuario.getEmail());
+        userResp.setCep(usuario.getCep());
+        userResp.setBio(usuario.getBio());
+        userResp.setRole(usuario.getRole());
         userResp.setDateCreate(usuario.getDateCreate());
+
         return userResp;
     }
 
@@ -98,7 +131,6 @@ public class UsersService {
         usuario.setEmail(userReq.getEmail());
         usuario.setCep(userReq.getCep());
         usuario.setBio(userReq.getBio());
-        usuario.setRole(userReq.getRole());
         usersRepository.save(usuario);
         UserResp userResp = new UserResp();
         userResp.setId(usuario.getIdUser());

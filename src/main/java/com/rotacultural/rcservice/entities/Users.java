@@ -1,5 +1,6 @@
 package com.rotacultural.rcservice.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.rotacultural.rcservice.entities.enums.Role;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -31,6 +32,7 @@ public class Users {
     @Column(nullable = false, unique = true)
     private String email;
 
+    @JsonIgnore
     @NotBlank
     @Column(length = 255, nullable = false)
     private String password;
