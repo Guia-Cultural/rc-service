@@ -10,7 +10,9 @@ import com.rotacultural.rcservice.repositories.CategoriesRepository;
 import com.rotacultural.rcservice.repositories.PreferencesRepository;
 import com.rotacultural.rcservice.repositories.TripsRepository;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -38,6 +40,17 @@ public class PreferencesService {
         Categories categoria = categoriesRepository.findById(prefReq.getCatId())
                 .orElseThrow(() -> new EntityNotFoundException("Categoria não encontrada"));
 
+        if (preferencesRepository.existsByTrips_IdTripAndCategories_IdCat(
+                prefReq.getTripId(),
+                prefReq.getCatId()
+        )) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Esta categoria já está associada à viagem"
+            );
+        }
+
+
         Preferences preferencia = new Preferences();
         preferencia.setCategories(categoria);
         preferencia.setTrips(viagem);
@@ -61,13 +74,15 @@ public class PreferencesService {
         return toResponse(preferencia);
     }
 
+
     private PrefResp toResponse(Preferences preferencia) {
         PrefResp resposta = new PrefResp();
 
         resposta.setId(preferencia.getIdPref());
-        resposta.setCategories(preferencia.getCategories());
-        resposta.setTrips(preferencia.getTrips());
+        resposta.setTripId(preferencia.getTrips().getIdTrip());
+        resposta.setCatId(preferencia.getCategories().getIdCat());
 
         return resposta;
     }
+
 }

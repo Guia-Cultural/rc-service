@@ -101,6 +101,7 @@ public class TripsService {
         }
     }
 
+
     private TripResp toResponse(Trips viagem) {
         TripResp resposta = new TripResp();
 
@@ -110,7 +111,9 @@ public class TripsService {
         resposta.setStartDate(viagem.getStartDate());
         resposta.setEndDate(viagem.getEndDate());
         resposta.setBudget(viagem.getBudget());
+        resposta.setDateCreate(viagem.getDateCreate());
 
         return resposta;
     }
+
 }

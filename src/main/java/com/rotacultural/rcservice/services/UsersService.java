@@ -1,6 +1,7 @@
 
 package com.rotacultural.rcservice.services;
 
+import com.rotacultural.rcservice.DTOs.Trips.TripResp;
 import com.rotacultural.rcservice.DTOs.Users.UserReq;
 import com.rotacultural.rcservice.DTOs.Users.UserResp;
 import com.rotacultural.rcservice.DTOs.Users.UserRespTrip;
@@ -28,6 +29,14 @@ public class UsersService {
     }
 
     public UserResp create(UserReq userReq) {
+
+        if (usersRepository.existsByEmail(userReq.getEmail())) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Este e-mail já está cadastrado"
+            );
+        }
+
         if (userReq.getRole() != Role.NATIVO &&
                 userReq.getRole() != Role.USUARIO) {
             throw new ResponseStatusException(
@@ -77,6 +86,14 @@ public class UsersService {
         Users usuario = usersRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
 
+        if (usersRepository.existsByEmailAndIdUserNot(userReq.getEmail(), id)) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Este e-mail já pertence a outro usuário"
+            );
+        }
+
+
         usuario.setName(userReq.getName());
         usuario.setEmail(userReq.getEmail());
         usuario.setCep(userReq.getCep());
@@ -93,19 +110,42 @@ public class UsersService {
         usersRepository.deleteById(id);
     }
 
+
     public List<UserRespTrip> getAllTrip() {
         return usersRepository.findAll().stream().map(usuario -> {
             UserRespTrip resposta = new UserRespTrip();
+
             resposta.setId(usuario.getIdUser());
             resposta.setName(usuario.getName());
             resposta.setEmail(usuario.getEmail());
             resposta.setCep(usuario.getCep());
             resposta.setBio(usuario.getBio());
             resposta.setRole(usuario.getRole());
-            resposta.setTrips(usuario.getTrips());
+            resposta.setDateCreate(usuario.getDateCreate());
+
+            List<TripResp> viagens = usuario.getTrips()
+                    .stream()
+                    .map(viagem -> {
+                        TripResp tripResp = new TripResp();
+
+                        tripResp.setId(viagem.getIdTrip());
+                        tripResp.setUserId(usuario.getIdUser());
+                        tripResp.setDestination(viagem.getDestination());
+                        tripResp.setStartDate(viagem.getStartDate());
+                        tripResp.setEndDate(viagem.getEndDate());
+                        tripResp.setBudget(viagem.getBudget());
+                        tripResp.setDateCreate(viagem.getDateCreate());
+
+                        return tripResp;
+                    })
+                    .toList();
+
+            resposta.setTrips(viagens);
+
             return resposta;
         }).toList();
     }
+
 
     private UserResp toResponse(Users usuario) {
         UserResp resposta = new UserResp();
