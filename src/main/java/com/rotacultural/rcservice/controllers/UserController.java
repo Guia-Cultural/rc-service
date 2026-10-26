@@ -38,16 +38,16 @@ public class UserController {
 
     }
 
-    @GetMapping("/{cep}")
-    public ResponseEntity<?> readByCep(@PathVariable String cep){
+    @GetMapping("/cep/{cep}")
+    public ResponseEntity<?> readByCep(@PathVariable String cep) {
         try {
-            return ResponseEntity.ok().body(usersService.getByCep(cep));
-        }catch (EntityNotFoundException e){
+            return ResponseEntity.ok(usersService.getByCep(cep));
+        } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
 
-    @PutMapping
+    @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable long id, @RequestBody @Valid UserReq userReq){
         try {
             return ResponseEntity.ok().body(usersService.update(id, userReq));
@@ -57,7 +57,7 @@ public class UserController {
 
     }
 
-    @DeleteMapping
+    @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable long id){
         try{
             usersService.delete(id);
