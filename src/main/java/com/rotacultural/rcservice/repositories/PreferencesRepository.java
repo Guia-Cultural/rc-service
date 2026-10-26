@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface PreferencesRepository extends JpaRepository<Preferences, Long> {
+    boolean existsByTrips_IdTripAndCategories_IdCat(Long tripId, Long catId);
 }
