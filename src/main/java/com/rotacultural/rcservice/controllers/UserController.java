@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/usuario")
+@RequestMapping("/user")
 public class UserController {
 
     private final UsersService usersService;
@@ -71,7 +71,7 @@ public class UserController {
 
     }
 
-    @GetMapping("/viagens")
+    @GetMapping("/trip")
     public ResponseEntity<?> readByViagens(){
         return ResponseEntity.ok().body(usersService.getAllTrip());
     }

@@ -19,11 +19,11 @@ public class CategoryService {
         this.categoriesRepository = categoriesRepository;
     }
 
-    public CatResp create(CatReq catReq) {
-        Categories categoria = new Categories();
-        categoria.setName(catReq.getName());
+    public CatResp create(CatReq req) {
+        Categories category = new Categories();
+        category.setName(req.getName());
 
-        return toResponse(categoriesRepository.save(categoria));
+        return toResponse(categoriesRepository.save(category));
     }
 
     public List<CatResp> getAll() {
@@ -34,19 +34,19 @@ public class CategoryService {
     }
 
     public CatResp getById(long id) {
-        Categories categoria = categoriesRepository.findById(id)
+        Categories category = categoriesRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Categoria não encontrada"));
 
-        return toResponse(categoria);
+        return toResponse(category);
     }
 
-    public CatResp update(long id, CatReq catReq) {
-        Categories categoria = categoriesRepository.findById(id)
+    public CatResp update(long id, CatReq req) {
+        Categories category = categoriesRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Categoria não encontrada"));
 
-        categoria.setName(catReq.getName());
+        category.setName(req.getName());
 
-        return toResponse(categoriesRepository.save(categoria));
+        return toResponse(categoriesRepository.save(category));
     }
 
     public String delete(long id) {
@@ -58,10 +58,10 @@ public class CategoryService {
         return "Categoria removida com sucesso";
     }
 
-    private CatResp toResponse(Categories categoria) {
-        CatResp resposta = new CatResp();
-        resposta.setId(categoria.getIdCat());
-        resposta.setName(categoria.getName());
-        return resposta;
+    private CatResp toResponse(Categories category) {
+        CatResp response = new CatResp();
+        response.setId(category.getIdCat());
+        response.setName(category.getName());
+        return response;
     }
 }

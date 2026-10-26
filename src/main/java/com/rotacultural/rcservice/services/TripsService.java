@@ -25,20 +25,20 @@ public class TripsService {
         this.usersRepository = usersRepository;
     }
 
-    public TripResp create(TripReq tripReq) {
-        validarDatas(tripReq);
+    public TripResp create(TripReq req) {
+        dateValidation(req);
 
-        Users usuario = usersRepository.findById(tripReq.getUserId())
+        Users usuario = usersRepository.findById(req.getUserId())
                 .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
 
-        Trips viagem = new Trips();
-        viagem.setUser(usuario);
-        viagem.setDestination(tripReq.getDestination());
-        viagem.setStartDate(tripReq.getStartDate());
-        viagem.setEndDate(tripReq.getEndDate());
-        viagem.setBudget(tripReq.getBudget());
+        Trips trip = new Trips();
+        trip.setUser(usuario);
+        trip.setDestination(req.getDestination());
+        trip.setStartDate(req.getStartDate());
+        trip.setEndDate(req.getEndDate());
+        trip.setBudget(req.getBudget());
 
-        Trips viagemSalva = tripsRepository.save(viagem);
+        Trips viagemSalva = tripsRepository.save(trip);
 
         return toResponse(viagemSalva);
     }
@@ -51,30 +51,30 @@ public class TripsService {
     }
 
     public TripResp getById(Long id) {
-        Trips viagem = tripsRepository.findById(id)
+        Trips trip = tripsRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Viagem não encontrada"));
 
-        return toResponse(viagem);
+        return toResponse(trip);
     }
 
-    public TripResp update(long id, TripReq tripReq) {
-        validarDatas(tripReq);
+    public TripResp update(long id, TripReq req) {
+        dateValidation(req);
 
-        Trips viagem = tripsRepository.findById(id)
+        Trips trip = tripsRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Viagem não encontrada"));
 
-        Users usuario = usersRepository.findById(tripReq.getUserId())
+        Users user = usersRepository.findById(req.getUserId())
                 .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
 
-        viagem.setUser(usuario);
-        viagem.setDestination(tripReq.getDestination());
-        viagem.setStartDate(tripReq.getStartDate());
-        viagem.setEndDate(tripReq.getEndDate());
-        viagem.setBudget(tripReq.getBudget());
+        trip.setUser(user);
+        trip.setDestination(req.getDestination());
+        trip.setStartDate(req.getStartDate());
+        trip.setEndDate(req.getEndDate());
+        trip.setBudget(req.getBudget());
 
-        Trips viagemSalva = tripsRepository.save(viagem);
+        Trips saveTrip = tripsRepository.save(trip);
 
-        return toResponse(viagemSalva);
+        return toResponse(saveTrip);
     }
 
     public void delete(long id) {
@@ -85,15 +85,15 @@ public class TripsService {
         tripsRepository.deleteById(id);
     }
 
-    private void validarDatas(TripReq tripReq) {
-        if (tripReq.getStartDate() == null || tripReq.getEndDate() == null) {
+    private void dateValidation(TripReq req) {
+        if (req.getStartDate() == null || req.getEndDate() == null) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
                     "As datas inicial e final são obrigatórias"
             );
         }
 
-        if (tripReq.getEndDate().isBefore(tripReq.getStartDate())) {
+        if (req.getEndDate().isBefore(req.getStartDate())) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
                     "A data final não pode ser anterior à data inicial"
@@ -102,18 +102,18 @@ public class TripsService {
     }
 
 
-    private TripResp toResponse(Trips viagem) {
-        TripResp resposta = new TripResp();
+    private TripResp toResponse(Trips trip) {
+        TripResp response = new TripResp();
 
-        resposta.setId(viagem.getIdTrip());
-        resposta.setUserId(viagem.getUser().getIdUser());
-        resposta.setDestination(viagem.getDestination());
-        resposta.setStartDate(viagem.getStartDate());
-        resposta.setEndDate(viagem.getEndDate());
-        resposta.setBudget(viagem.getBudget());
-        resposta.setDateCreate(viagem.getDateCreate());
+        response.setId(trip.getIdTrip());
+        response.setUserId(trip.getUser().getIdUser());
+        response.setDestination(trip.getDestination());
+        response.setStartDate(trip.getStartDate());
+        response.setEndDate(trip.getEndDate());
+        response.setBudget(trip.getBudget());
+        response.setDateCreate(trip.getDateCreate());
 
-        return resposta;
+        return response;
     }
 
 }

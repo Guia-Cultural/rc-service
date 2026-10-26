@@ -33,16 +33,16 @@ public class PreferencesService {
         this.tripsRepository = tripsRepository;
     }
 
-    public PrefResp create(PrefReq prefReq) {
-        Trips viagem = tripsRepository.findById(prefReq.getTripId())
+    public PrefResp create(PrefReq req) {
+        Trips trip = tripsRepository.findById(req.getTripId())
                 .orElseThrow(() -> new EntityNotFoundException("Viagem não encontrada"));
 
-        Categories categoria = categoriesRepository.findById(prefReq.getCatId())
+        Categories categoria = categoriesRepository.findById(req.getCatId())
                 .orElseThrow(() -> new EntityNotFoundException("Categoria não encontrada"));
 
         if (preferencesRepository.existsByTrips_IdTripAndCategories_IdCat(
-                prefReq.getTripId(),
-                prefReq.getCatId()
+                req.getTripId(),
+                req.getCatId()
         )) {
             throw new ResponseStatusException(
                     HttpStatus.CONFLICT,
@@ -51,11 +51,11 @@ public class PreferencesService {
         }
 
 
-        Preferences preferencia = new Preferences();
-        preferencia.setCategories(categoria);
-        preferencia.setTrips(viagem);
+        Preferences preference = new Preferences();
+        preference.setCategories(categoria);
+        preference.setTrips(trip);
 
-        Preferences preferenciaSalva = preferencesRepository.save(preferencia);
+        Preferences preferenciaSalva = preferencesRepository.save(preference);
 
         return toResponse(preferenciaSalva);
     }
@@ -68,21 +68,21 @@ public class PreferencesService {
     }
 
     public PrefResp getById(Long id) {
-        Preferences preferencia = preferencesRepository.findById(id)
+        Preferences preference = preferencesRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Preferência não encontrada"));
 
-        return toResponse(preferencia);
+        return toResponse(preference);
     }
 
 
-    private PrefResp toResponse(Preferences preferencia) {
-        PrefResp resposta = new PrefResp();
+    private PrefResp toResponse(Preferences preference) {
+        PrefResp response = new PrefResp();
 
-        resposta.setId(preferencia.getIdPref());
-        resposta.setTripId(preferencia.getTrips().getIdTrip());
-        resposta.setCatId(preferencia.getCategories().getIdCat());
+        response.setId(preference.getIdPref());
+        response.setTripId(preference.getTrips().getIdTrip());
+        response.setCatId(preference.getCategories().getIdCat());
 
-        return resposta;
+        return response;
     }
 
 }

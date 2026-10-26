@@ -28,32 +28,32 @@ public class UsersService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public UserResp create(UserReq userReq) {
+    public UserResp create(UserReq req) {
 
-        if (usersRepository.existsByEmail(userReq.getEmail())) {
+        if (usersRepository.existsByEmail(req.getEmail())) {
             throw new ResponseStatusException(
                     HttpStatus.CONFLICT,
                     "Este e-mail já está cadastrado"
             );
         }
 
-        if (userReq.getRole() != Role.NATIVO &&
-                userReq.getRole() != Role.USUARIO) {
+        if (req.getRole() != Role.NATIVO &&
+                req.getRole() != Role.USUARIO) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
                     "Tipo de usuário inválido para cadastro"
             );
         }
 
-        Users usuario = new Users();
-        usuario.setName(userReq.getName());
-        usuario.setEmail(userReq.getEmail());
-        usuario.setPassword(passwordEncoder.encode(userReq.getPassword()));
-        usuario.setCep(userReq.getCep());
-        usuario.setRole(userReq.getRole());
-        usuario.setBio(userReq.getBio());
+        Users user = new Users();
+        user.setName(req.getName());
+        user.setEmail(req.getEmail());
+        user.setPassword(passwordEncoder.encode(req.getPassword()));
+        user.setCep(req.getCep());
+        user.setRole(req.getRole());
+        user.setBio(req.getBio());
 
-        return toResponse(usersRepository.save(usuario));
+        return toResponse(usersRepository.save(user));
     }
 
     public List<UserResp> getAll() {
@@ -71,22 +71,22 @@ public class UsersService {
     }
 
     public List<UserResp> getByCep(String cep) {
-        List<Users> usuarios = usersRepository.findByCep(cep);
+        List<Users> user = usersRepository.findByCep(cep);
 
-        if (usuarios.isEmpty()) {
+        if (user.isEmpty()) {
             throw new EntityNotFoundException("CEP não encontrado");
         }
 
-        return usuarios.stream()
+        return user.stream()
                 .map(this::toResponse)
                 .toList();
     }
 
-    public UserResp update(long id, UserUpdateReq userReq) {
-        Users usuario = usersRepository.findById(id)
+    public UserResp update(long id, UserUpdateReq req) {
+        Users user = usersRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
 
-        if (usersRepository.existsByEmailAndIdUserNot(userReq.getEmail(), id)) {
+        if (usersRepository.existsByEmailAndIdUserNot(req.getEmail(), id)) {
             throw new ResponseStatusException(
                     HttpStatus.CONFLICT,
                     "Este e-mail já pertence a outro usuário"
@@ -94,12 +94,12 @@ public class UsersService {
         }
 
 
-        usuario.setName(userReq.getName());
-        usuario.setEmail(userReq.getEmail());
-        usuario.setCep(userReq.getCep());
-        usuario.setBio(userReq.getBio());
+        user.setName(req.getName());
+        user.setEmail(req.getEmail());
+        user.setCep(req.getCep());
+        user.setBio(req.getBio());
 
-        return toResponse(usersRepository.save(usuario));
+        return toResponse(usersRepository.save(user));
     }
 
     public void delete(long id) {
@@ -112,50 +112,50 @@ public class UsersService {
 
 
     public List<UserRespTrip> getAllTrip() {
-        return usersRepository.findAll().stream().map(usuario -> {
-            UserRespTrip resposta = new UserRespTrip();
+        return usersRepository.findAll().stream().map(user -> {
+            UserRespTrip response = new UserRespTrip();
 
-            resposta.setId(usuario.getIdUser());
-            resposta.setName(usuario.getName());
-            resposta.setEmail(usuario.getEmail());
-            resposta.setCep(usuario.getCep());
-            resposta.setBio(usuario.getBio());
-            resposta.setRole(usuario.getRole());
-            resposta.setDateCreate(usuario.getDateCreate());
+            response.setId(user.getIdUser());
+            response.setName(user.getName());
+            response.setEmail(user.getEmail());
+            response.setCep(user.getCep());
+            response.setBio(user.getBio());
+            response.setRole(user.getRole());
+            response.setDateCreate(user.getDateCreate());
 
-            List<TripResp> viagens = usuario.getTrips()
+            List<TripResp> trips = user.getTrips()
                     .stream()
-                    .map(viagem -> {
+                    .map(trip -> {
                         TripResp tripResp = new TripResp();
 
-                        tripResp.setId(viagem.getIdTrip());
-                        tripResp.setUserId(usuario.getIdUser());
-                        tripResp.setDestination(viagem.getDestination());
-                        tripResp.setStartDate(viagem.getStartDate());
-                        tripResp.setEndDate(viagem.getEndDate());
-                        tripResp.setBudget(viagem.getBudget());
-                        tripResp.setDateCreate(viagem.getDateCreate());
+                        tripResp.setId(trip.getIdTrip());
+                        tripResp.setUserId(user.getIdUser());
+                        tripResp.setDestination(trip.getDestination());
+                        tripResp.setStartDate(trip.getStartDate());
+                        tripResp.setEndDate(trip.getEndDate());
+                        tripResp.setBudget(trip.getBudget());
+                        tripResp.setDateCreate(trip.getDateCreate());
 
                         return tripResp;
                     })
                     .toList();
 
-            resposta.setTrips(viagens);
+            response.setTrips(trips);
 
-            return resposta;
+            return response;
         }).toList();
     }
 
 
-    private UserResp toResponse(Users usuario) {
-        UserResp resposta = new UserResp();
-        resposta.setId(usuario.getIdUser());
-        resposta.setName(usuario.getName());
-        resposta.setEmail(usuario.getEmail());
-        resposta.setCep(usuario.getCep());
-        resposta.setRole(usuario.getRole());
-        resposta.setBio(usuario.getBio());
-        resposta.setDateCreate(usuario.getDateCreate());
-        return resposta;
+    private UserResp toResponse(Users user) {
+        UserResp response = new UserResp();
+        response.setId(user.getIdUser());
+        response.setName(user.getName());
+        response.setEmail(user.getEmail());
+        response.setCep(user.getCep());
+        response.setRole(user.getRole());
+        response.setBio(user.getBio());
+        response.setDateCreate(user.getDateCreate());
+        return response;
     }
 }
