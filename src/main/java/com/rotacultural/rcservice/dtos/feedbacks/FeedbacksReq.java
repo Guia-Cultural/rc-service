@@ -1,4 +1,4 @@
-package com.rotacultural.rcservice.DTOs.Feedbacks;
+package com.rotacultural.rcservice.dtos.feedbacks;
 
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;

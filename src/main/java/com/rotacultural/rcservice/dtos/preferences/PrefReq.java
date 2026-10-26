@@ -1,4 +1,4 @@
-package com.rotacultural.rcservice.DTOs.Preferences;
+package com.rotacultural.rcservice.dtos.preferences;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;

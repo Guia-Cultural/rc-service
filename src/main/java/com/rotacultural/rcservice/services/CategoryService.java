@@ -1,8 +1,8 @@
 
 package com.rotacultural.rcservice.services;
 
-import com.rotacultural.rcservice.DTOs.Categories.CatReq;
-import com.rotacultural.rcservice.DTOs.Categories.CatResp;
+import com.rotacultural.rcservice.dtos.categories.CatReq;
+import com.rotacultural.rcservice.dtos.categories.CatResp;
 import com.rotacultural.rcservice.entities.Categories;
 import com.rotacultural.rcservice.repositories.CategoriesRepository;
 import jakarta.persistence.EntityNotFoundException;

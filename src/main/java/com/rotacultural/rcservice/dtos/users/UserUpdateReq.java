@@ -1,5 +1,5 @@
 
-package com.rotacultural.rcservice.DTOs.Users;
+package com.rotacultural.rcservice.dtos.users;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

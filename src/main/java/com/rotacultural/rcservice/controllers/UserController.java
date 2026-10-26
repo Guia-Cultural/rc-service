@@ -1,7 +1,7 @@
 package com.rotacultural.rcservice.controllers;
 
-import com.rotacultural.rcservice.DTOs.Users.UserReq;
-import com.rotacultural.rcservice.DTOs.Users.UserUpdateReq;
+import com.rotacultural.rcservice.dtos.users.UserReq;
+import com.rotacultural.rcservice.dtos.users.UserUpdateReq;
 import com.rotacultural.rcservice.services.UsersService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;

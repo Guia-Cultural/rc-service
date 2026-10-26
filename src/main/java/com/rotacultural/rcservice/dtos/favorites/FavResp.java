@@ -1,4 +1,4 @@
-package com.rotacultural.rcservice.DTOs.Favorites;
+package com.rotacultural.rcservice.dtos.favorites;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

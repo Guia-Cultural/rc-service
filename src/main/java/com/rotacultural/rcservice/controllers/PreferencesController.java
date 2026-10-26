@@ -1,6 +1,6 @@
 package com.rotacultural.rcservice.controllers;
 
-import com.rotacultural.rcservice.DTOs.Preferences.PrefReq;
+import com.rotacultural.rcservice.dtos.preferences.PrefReq;
 import com.rotacultural.rcservice.services.PreferencesService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;

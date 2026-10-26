@@ -1,4 +1,4 @@
-package com.rotacultural.rcservice.DTOs.Users;
+package com.rotacultural.rcservice.dtos.users;
 
 import com.rotacultural.rcservice.entities.enums.Role;
 import jakarta.validation.constraints.Email;

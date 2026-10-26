@@ -1,8 +1,8 @@
 
 package com.rotacultural.rcservice.services;
 
-import com.rotacultural.rcservice.DTOs.Preferences.PrefReq;
-import com.rotacultural.rcservice.DTOs.Preferences.PrefResp;
+import com.rotacultural.rcservice.dtos.preferences.PrefReq;
+import com.rotacultural.rcservice.dtos.preferences.PrefResp;
 import com.rotacultural.rcservice.entities.Categories;
 import com.rotacultural.rcservice.entities.Preferences;
 import com.rotacultural.rcservice.entities.Trips;

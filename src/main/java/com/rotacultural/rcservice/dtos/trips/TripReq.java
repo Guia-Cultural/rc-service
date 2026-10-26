@@ -1,4 +1,4 @@
-package com.rotacultural.rcservice.DTOs.Trips;
+package com.rotacultural.rcservice.dtos.trips;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

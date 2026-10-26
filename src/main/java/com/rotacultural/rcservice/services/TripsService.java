@@ -1,8 +1,8 @@
 
 package com.rotacultural.rcservice.services;
 
-import com.rotacultural.rcservice.DTOs.Trips.TripReq;
-import com.rotacultural.rcservice.DTOs.Trips.TripResp;
+import com.rotacultural.rcservice.dtos.trips.TripReq;
+import com.rotacultural.rcservice.dtos.trips.TripResp;
 import com.rotacultural.rcservice.entities.Trips;
 import com.rotacultural.rcservice.entities.Users;
 import com.rotacultural.rcservice.repositories.TripsRepository;

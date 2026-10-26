@@ -1,5 +1,5 @@
 
-package com.rotacultural.rcservice.DTOs.Preferences;
+package com.rotacultural.rcservice.dtos.preferences;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

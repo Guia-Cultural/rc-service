@@ -1,30 +1,20 @@
-package com.rotacultural.rcservice.DTOs.Itineraries;
+package com.rotacultural.rcservice.dtos.favorites;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
-
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ItineraryReq {
+public class FavReq {
     @NotNull
     @Positive
-    private Long tripId;
-
-    @NotNull
-    private LocalDate day;
-
+    private Long userId;
     @NotNull
     @Positive
     private Long locId;
 
-    @Size(max = 500)
-    private String description;
 }

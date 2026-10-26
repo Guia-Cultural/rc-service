@@ -1,6 +1,6 @@
 package com.rotacultural.rcservice.controllers;
 
-import com.rotacultural.rcservice.DTOs.Trips.TripReq;
+import com.rotacultural.rcservice.dtos.trips.TripReq;
 import com.rotacultural.rcservice.services.TripsService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;

@@ -1,4 +1,4 @@
-package com.rotacultural.rcservice.DTOs.places;
+package com.rotacultural.rcservice.dtos.places;
 
 import com.rotacultural.rcservice.entities.enums.Price;
 import com.rotacultural.rcservice.entities.enums.Status;

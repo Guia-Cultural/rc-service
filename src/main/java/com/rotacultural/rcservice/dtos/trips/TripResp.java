@@ -1,4 +1,4 @@
-package com.rotacultural.rcservice.DTOs.Trips;
+package com.rotacultural.rcservice.dtos.trips;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

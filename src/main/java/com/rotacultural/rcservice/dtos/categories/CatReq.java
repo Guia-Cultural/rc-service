@@ -1,4 +1,4 @@
-package com.rotacultural.rcservice.DTOs.Categories;
+package com.rotacultural.rcservice.dtos.categories;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

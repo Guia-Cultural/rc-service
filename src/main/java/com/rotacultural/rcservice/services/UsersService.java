@@ -1,11 +1,11 @@
 
 package com.rotacultural.rcservice.services;
 
-import com.rotacultural.rcservice.DTOs.Trips.TripResp;
-import com.rotacultural.rcservice.DTOs.Users.UserReq;
-import com.rotacultural.rcservice.DTOs.Users.UserResp;
-import com.rotacultural.rcservice.DTOs.Users.UserRespTrip;
-import com.rotacultural.rcservice.DTOs.Users.UserUpdateReq;
+import com.rotacultural.rcservice.dtos.trips.TripResp;
+import com.rotacultural.rcservice.dtos.users.UserReq;
+import com.rotacultural.rcservice.dtos.users.UserResp;
+import com.rotacultural.rcservice.dtos.users.UserRespTrip;
+import com.rotacultural.rcservice.dtos.users.UserUpdateReq;
 import com.rotacultural.rcservice.entities.Users;
 import com.rotacultural.rcservice.entities.enums.Role;
 import com.rotacultural.rcservice.repositories.UsersRepository;

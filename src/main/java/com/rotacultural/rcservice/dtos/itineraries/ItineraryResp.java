@@ -1,4 +1,4 @@
-package com.rotacultural.rcservice.DTOs.Itineraries;
+package com.rotacultural.rcservice.dtos.itineraries;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
