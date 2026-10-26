@@ -1,6 +1,7 @@
 package com.rotacultural.rcservice.controllers;
 
 import com.rotacultural.rcservice.DTOs.Users.UserReq;
+import com.rotacultural.rcservice.DTOs.Users.UserUpdateReq;
 import com.rotacultural.rcservice.services.UsersService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
@@ -48,13 +49,15 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable long id, @RequestBody @Valid UserReq userReq){
+    public ResponseEntity<?> update(
+            @PathVariable long id,
+            @RequestBody @Valid UserUpdateReq userReq
+    ) {
         try {
-            return ResponseEntity.ok().body(usersService.update(id, userReq));
-        }catch (EntityNotFoundException e){
+            return ResponseEntity.ok(usersService.update(id, userReq));
+        } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
-
     }
 
     @DeleteMapping("/{id}")
