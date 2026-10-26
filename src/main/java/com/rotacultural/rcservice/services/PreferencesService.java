@@ -74,6 +74,49 @@ public class PreferencesService {
         return toResponse(preference);
     }
 
+    public PrefResp update(Long id, PrefReq req) {
+        Preferences preference = preferencesRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Preferência não encontrada"
+                ));
+
+        Trips trip = tripsRepository.findById(req.getTripId())
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Viagem não encontrada"
+                ));
+
+        Categories category = categoriesRepository.findById(req.getCatId())
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Categoria não encontrada"
+                ));
+
+        boolean changed = !preference.getTrips().getIdTrip().equals(req.getTripId())
+                || !preference.getCategories().getIdCat().equals(req.getCatId());
+
+        if (changed && preferencesRepository.existsByTrips_IdTripAndCategories_IdCat(
+                req.getTripId(), req.getCatId()
+        )) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Esta categoria já está associada à viagem"
+            );
+        }
+
+        preference.setTrips(trip);
+        preference.setCategories(category);
+
+        return toResponse(preferencesRepository.save(preference));
+    }
+
+    public void delete(Long id) {
+        Preferences preference = preferencesRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Preferência não encontrada"
+                ));
+
+        preferencesRepository.delete(preference);
+    }
+
 
     private PrefResp toResponse(Preferences preference) {
         PrefResp response = new PrefResp();
