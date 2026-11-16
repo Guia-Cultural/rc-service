@@ -190,5 +190,5 @@ Hierarquia configurada no `SecurityConfig`: **`ADMIN > NATIVO > USUARIO`** (+ ac
 
 ## Status do MVP
 
-- **Concluído no código:** Autenticação JWT + BCrypt, hierarquia `ADMIN > NATIVO > USUARIO`, profiles `dev`/`prod` (sem fallback de JWT nem senhas demo em `prod`, `ddl-auto=validate` + SQL `V1`/`V2` MySQL 8.0), `AzureBlobStorageService` (`DefaultAzureCredential` + container privado) e `FileSystemStorageService`, `MediaController` com URL assinada para fotos pendentes, busca/filtros/paginação de locais aprovados, viagens (limite 30 dias), preferências, recomendações determinísticas, roteiros, favoritos, avaliações, `/health` e testes integrados (`7/7`).
-- **Aguardando autorização/deploy (Etapa 9/10):** Provisionamento na Azure (Container Apps + ACR + MySQL Flexible Server + Storage Account) via `../deploy/azure-deploy.ps1` e validação em produção.
+- **Concluído no código:** Auth JWT/BCrypt, permissões e propriedade, perfis dev/prod seguros, Flyway V1/V2 + validate, Blob privado/URLs assinadas, locais, viagens, preferências, recomendações determinísticas, roteiros, favoritos e avaliações. Suíte completa: 12/12.
+- **Publicado:** Azure Students, `chilecentral`, imagem por digest e identidade `id-rc-service` atribuída pelo usuário (compatível com o ambiente Express). Scripts versionados em `deploy/`; estado e evidências em `docs/MVP_PROGRESS.md`.
