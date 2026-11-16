@@ -1,5 +1,6 @@
 package com.rotacultural.rcservice.config;
 
+import com.rotacultural.rcservice.repositories.UsersRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,7 +14,9 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
-import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
+import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -153,13 +156,20 @@ public class SecurityConfig {
     }
 
     @Bean
-    public JwtAuthenticationConverter jwtAuthenticationConverter() {
-        JwtGrantedAuthoritiesConverter roles = new JwtGrantedAuthoritiesConverter();
-        roles.setAuthoritiesClaimName("role");
-        roles.setAuthorityPrefix("ROLE_");
-
+    public JwtAuthenticationConverter jwtAuthenticationConverter(UsersRepository usersRepository) {
         JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
-        converter.setJwtGrantedAuthoritiesConverter(roles);
+        // Alterações de perfil e exclusões têm efeito imediato, mesmo com JWT ainda válido.
+        converter.setJwtGrantedAuthoritiesConverter(jwt -> {
+            Long userId;
+            try {
+                userId = Long.valueOf(jwt.getSubject());
+            } catch (NumberFormatException ex) {
+                throw new OAuth2AuthenticationException(new OAuth2Error("invalid_token"));
+            }
+            var user = usersRepository.findById(userId)
+                    .orElseThrow(() -> new OAuth2AuthenticationException(new OAuth2Error("invalid_token")));
+            return List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()));
+        });
         return converter;
     }
 

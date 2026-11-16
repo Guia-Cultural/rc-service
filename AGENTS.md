@@ -21,5 +21,6 @@
 ## Comandos e Documentação
 - Testes (perfil `test` em `rotacultural_test`): `.\mvnw.cmd test`
 - Build JAR: `.\mvnw.cmd -DskipTests package`
+- Produção: Flyway V1/V2 + `ddl-auto=validate`; JDBC exige `sslMode=VERIFY_IDENTITY`. Scripts versionados em `deploy/` usam Jib 3.5.2 e recursos existentes em `chilecentral`.
 - Docs e progresso: `README.md`, `docs/MVP_PROGRESS.md`, skill `.agents/skills/rotacultural-backend/SKILL.md`.
 - Git: commitar apenas em `feat/mvp-integration`; nunca fazer merge na `main` sem aprovação.

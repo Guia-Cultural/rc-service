@@ -103,6 +103,8 @@ public final class ImageFileValidator {
                 if (ALLOWED_EXTENSIONS.contains(ext)) {
                     return ext;
                 }
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "Extensão de arquivo não permitida. Utilize .jpg, .jpeg, .png ou .webp");
             }
         }
         if ("image/png".equalsIgnoreCase(contentType)) {

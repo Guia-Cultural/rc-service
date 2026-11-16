@@ -14,6 +14,7 @@ Keep Spring Boot endpoints simple, secure, ownership-checked, and compatible wit
 ## Procedure
 1. **Endpoints & DTOs**: Place `@RestController` routes under `controllers/` and Jakarta-validated request/response records or POJOs under `dtos/`. Never return password hashes or internal stack traces.
 2. **Entities & Repositories**: Map columns accurately against `src/main/resources/db/migration/V1__baseline_schema.sql` and `V2__mvp_evolution.sql` so `prod` (`ddl-auto=validate`) stays compatible.
+   Production uses Flyway history/checksums; never reapply V2 manually or enable continue-on-error/baseline-on-migrate. Runtime DB user has DML only; apply new migrations separately before deploying.
 3. **Permissions & Ownership**:
    - Configure URL matchers in `SecurityConfig.java` obeying hierarchy `ADMIN > NATIVO > USUARIO` (keep specific `/places/my` and `/places/admin` before `/places/*`).
    - Enforce resource ownership inside the service using `authService.getCurrentUser()`, `authService.isAdmin()`, and `authService.requireOwnerOrAdmin(...)`.

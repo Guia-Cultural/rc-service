@@ -68,15 +68,17 @@ public class AzureBlobStorageService implements StorageService {
         String safeFolder = ImageFileValidator.sanitizeFolder(folder);
         String extension = ImageFileValidator.extractExtension(file.getOriginalFilename(), file.getContentType());
         String blobKey = safeFolder + "/" + UUID.randomUUID() + extension;
+        BlobClient blobClient = containerClient.getBlobClient(blobKey);
+        boolean uploaded = false;
 
         try {
             if (!containerClient.exists()) {
                 containerClient.create();
             }
 
-            BlobClient blobClient = containerClient.getBlobClient(blobKey);
             byte[] bytes = file.getBytes();
             blobClient.upload(BinaryData.fromBytes(bytes), true);
+            uploaded = true;
 
             String contentType = StringUtils.hasText(file.getContentType())
                     ? file.getContentType()
@@ -85,7 +87,14 @@ public class AzureBlobStorageService implements StorageService {
 
             // Salva apenas referência canônica interna (nunca URL SAS temporária no banco)
             return ImageFileValidator.UPLOADS_PREFIX + blobKey;
-        } catch (IOException e) {
+        } catch (IOException | RuntimeException e) {
+            if (uploaded) {
+                try {
+                    blobClient.deleteIfExists();
+                } catch (RuntimeException cleanupFailure) {
+                    e.addSuppressed(cleanupFailure);
+                }
+            }
             throw new ResponseStatusException(
                     HttpStatus.INTERNAL_SERVER_ERROR,
                     "Não foi possível enviar a imagem para o Azure Blob Storage"

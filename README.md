@@ -68,7 +68,8 @@ cp .env.example .env
 - `POST /auth/login` valida e-mail e senha via `PasswordEncoder` (BCrypt) e emite JWT HS256 com:
   - emissor (`iss`): `rc-service`
   - expiração (`exp`): `86400` segundos (24h)
-  - claims: `sub` (e-mail), `userId`, `email`, `name`, `role`
+  - claims: `sub` (ID do usuário), `userId`, `email`, `name`, `role`
+  - permissões consultam o perfil atual no banco; rebaixamento/exclusão tem efeito imediato.
 - `JwtConfig` rejeita em `prod` qualquer chave vazia ou igual ao segredo padrão de desenvolvimento.
 - `GET /auth/me` e todos os endpoints protegidos recuperam o usuário autenticado exclusivamente a partir do token validado pelo `JwtDecoder` — nenhum `userId` enviado no corpo da requisição redefine propriedade de dados.
 
@@ -80,7 +81,8 @@ cp .env.example .env
   - `src/main/resources/db/migration/V1__baseline_schema.sql`
   - `src/main/resources/db/migration/V2__mvp_evolution.sql`
 - **Desenvolvimento (`dev`):** usa `application-dev.properties` (`ddl-auto=update`), seed idempotente de categorias, 3 usuários demo (`admin@rotacultural.com`, `nativo@rotacultural.com`, `usuario@rotacultural.com`, senha `Senha@123`), 15 locais (`12` `APROVADO`, `2` `EM_AVALIACAO`, `1` `REJEITADO`) e avaliações iniciais.
-- **Produção (`prod`):** usa `application-prod.properties` (`ddl-auto=validate`, `spring.sql.init` com `V1` + `V2`, `app.seed.demo-users=false`, `app.seed.demo-places=false`, Swagger desabilitado por padrão).
+- **Produção (`prod`):** Flyway registra V1/V2 uma única vez, valida checksums e interrompe startup em erro; `ddl-auto=validate`, SQL init desativado e nenhum baseline/clean automático. `ProductionSafetyConfig` rejeita filesystem, seed demo, DDL automático e JDBC sem `sslMode=VERIFY_IDENTITY`.
+- Antes do primeiro deploy, aplicar migrações com `deploy/DatabaseSetup.java migrate` e credenciais administrativas apenas no ambiente do processo. O mesmo utilitário (`provision-user`) cria `rc_app` com SELECT/INSERT/UPDATE/DELETE no schema; não redefine senha existente. Schema preexistente sem histórico exige auditoria e adoção manual, nunca baseline automático.
 
 ---
 
@@ -136,8 +138,9 @@ cd rc-service
 .\mvnw.cmd test
 ```
 
-Suites incluídas (`7` testes ao todo):
+Suites incluídas (`12` testes ao todo):
 - `RcServiceApplicationTests`: carregamento do contexto Spring Boot + JPA + Security.
+- `MigrationIntegrationTests`: MySQL em `rotacultural_migration_test`, V1/V2, validação Hibernate e reexecução sem perda de dados; `UploadSafetyTests` e `ProductionSafetyTests`: falhas de upload e configuração insegura.
 - `MvpIntegrationTests`: cadastro com bloqueio de `ADMIN`/solicitação segura de `NATIVO`, login JWT e expiração, hierarquia e checagem de propriedade entre usuários, ciclo completo de locais + imagens protegidas enquanto `EM_AVALIACAO` + rejeição + aprovação, regra de 30 dias em viagens + recomendações determinísticas + roteiros + favoritos + avaliações, e validações de `/health`, guardião de chave JWT em `prod` e `AzureBlobStorageService`.
 
 ---

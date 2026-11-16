@@ -83,6 +83,27 @@ class MvpIntegrationTests {
     }
 
     @Test
+    void demotedAdminMustLosePermissionsWithPreviouslyIssuedToken() throws Exception {
+        String email = "role.audit." + UUID.randomUUID() + "@example.com";
+        Users user = new Users();
+        user.setName("Role audit");
+        user.setEmail(email);
+        user.setPassword(usersRepository.findByEmailIgnoreCase("admin@rotacultural.com").orElseThrow().getPassword());
+        user.setRole(Role.ADMIN);
+        user = usersRepository.save(user);
+        String oldToken = loginAndGetToken(email, "Senha@123");
+        mockMvc.perform(get("/user").header("Authorization", "Bearer " + oldToken))
+                .andExpect(status().isOk());
+        user.setRole(Role.USUARIO);
+        usersRepository.save(user);
+        mockMvc.perform(get("/user").header("Authorization", "Bearer " + oldToken))
+                .andExpect(status().isForbidden());
+        usersRepository.delete(user);
+        mockMvc.perform(get("/auth/me").header("Authorization", "Bearer " + oldToken))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
     void publicRegistrationShouldEnforceRoleSafetyAndRejectDuplicateEmail() throws Exception {
         String suffix = UUID.randomUUID().toString().substring(0, 8);
         String email = "novo." + suffix + "@rotacultural.com";
