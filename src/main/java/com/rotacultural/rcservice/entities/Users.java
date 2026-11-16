@@ -44,6 +44,9 @@ public class Users {
     @Column(nullable = false)
     private Role role;
 
+    @Column(name = "native_requested")
+    private Boolean nativeRequested = false;
+
     @Size(max = 500)
     private String bio;
 

@@ -10,6 +10,8 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -62,6 +64,25 @@ public class Places {
     @Enumerated(EnumType.STRING)
     private Price price;
 
+    @Column(name = "estimated_cost", precision = 10, scale = 2)
+    private BigDecimal estimatedCost;
+
+    @Size(max = 500)
+    @Column(name = "cover_image", length = 500)
+    private String coverImage;
+
+    @Size(max = 300)
+    @Column(name = "official_website", length = 300)
+    private String officialWebsite;
+
+    @Size(max = 300)
+    @Column(name = "ticket_link", length = 300)
+    private String ticketLink;
+
+    @Size(max = 150)
+    @Column(name = "contact", length = 150)
+    private String contact;
+
     @ManyToOne(optional = false)
     @JoinColumn(name = "create_by", nullable = false)
     private Users createBy;
@@ -69,11 +90,14 @@ public class Places {
     @Enumerated(EnumType.STRING)
     private Status status;
 
+    @Size(max = 500)
+    @Column(name = "rejection_reason", length = 500)
+    private String rejectionReason;
+
     @CreationTimestamp
     @Column(name = "date_create", nullable = false, updatable = false)
     private LocalDateTime dateCreate;
 
-
-
-
+    @OneToMany(mappedBy = "place", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PlaceImage> images = new ArrayList<>();
 }
