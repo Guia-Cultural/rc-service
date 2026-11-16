@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -17,6 +18,7 @@ public class LocResp {
     private String name;
     private String description;
     private Long catId;
+    private String categoryName;
     private String address;
     private String city;
     private String state;
@@ -25,7 +27,17 @@ public class LocResp {
     private BigDecimal longitude;
     private String businessHours;
     private Price price;
+    private BigDecimal estimatedCost;
+    private String coverImage;
+    private String officialWebsite;
+    private String ticketLink;
+    private String contact;
     private Long userId;
+    private String creatorName;
     private Status status;
+    private String rejectionReason;
     private LocalDateTime dateCreate;
+    private List<PlaceImageResp> images;
+    private Double averageRating;
+    private Integer reviewCount;
 }

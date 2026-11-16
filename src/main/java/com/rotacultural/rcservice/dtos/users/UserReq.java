@@ -3,7 +3,6 @@ package com.rotacultural.rcservice.dtos.users;
 import com.rotacultural.rcservice.entities.enums.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -28,9 +27,10 @@ public class UserReq {
 
     @Size(max = 11)
     private String cep;
-    
-    @NotNull(message = "Role é obrigatória")
+
     private Role role;
+
+    private Boolean requestNative;
 
     @Size(max = 500)
     private String bio;

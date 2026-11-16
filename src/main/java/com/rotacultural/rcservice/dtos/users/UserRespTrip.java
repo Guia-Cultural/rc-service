@@ -1,4 +1,3 @@
-
 package com.rotacultural.rcservice.dtos.users;
 
 import com.rotacultural.rcservice.dtos.trips.TripResp;
@@ -20,6 +19,7 @@ public class UserRespTrip {
     private String email;
     private String cep;
     private Role role;
+    private Boolean nativeRequested;
     private String bio;
     private LocalDateTime dateCreate;
     private List<TripResp> trips;

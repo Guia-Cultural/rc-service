@@ -12,11 +12,10 @@ import java.time.LocalDateTime;
 public class FeedbacksResp {
     private long id;
     private long userId;
+    private String userName;
     private long locId;
-
+    private String placeName;
     private Double assessment;
     private String commentary;
-
-
     private LocalDateTime dateCreate;
 }

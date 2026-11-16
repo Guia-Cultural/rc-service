@@ -2,7 +2,6 @@ package com.rotacultural.rcservice.controllers;
 
 import com.rotacultural.rcservice.dtos.feedbacks.FeedbacksReq;
 import com.rotacultural.rcservice.services.FeedbacksService;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,13 +19,8 @@ public class FeedbacksController {
 
     @PostMapping
     public ResponseEntity<?> create(@RequestBody @Valid FeedbacksReq req) {
-        try {
-            return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(feedbacksService.create(req));
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(e.getMessage());
-        }
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(feedbacksService.create(req));
     }
 
     @GetMapping
@@ -34,14 +28,14 @@ public class FeedbacksController {
         return ResponseEntity.ok(feedbacksService.getAll());
     }
 
+    @GetMapping("/place/{locId}")
+    public ResponseEntity<?> readByPlace(@PathVariable Long locId) {
+        return ResponseEntity.ok(feedbacksService.getByPlace(locId));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<?> readById(@PathVariable Long id) {
-        try {
-            return ResponseEntity.ok(feedbacksService.getById(id));
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(e.getMessage());
-        }
+        return ResponseEntity.ok(feedbacksService.getById(id));
     }
 
     @PutMapping("/{id}")
@@ -49,22 +43,12 @@ public class FeedbacksController {
             @PathVariable Long id,
             @RequestBody @Valid FeedbacksReq req
     ) {
-        try {
-            return ResponseEntity.ok(feedbacksService.update(id, req));
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(e.getMessage());
-        }
+        return ResponseEntity.ok(feedbacksService.update(id, req));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id) {
-        try {
-            feedbacksService.delete(id);
-            return ResponseEntity.noContent().build();
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(e.getMessage());
-        }
+        feedbacksService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }

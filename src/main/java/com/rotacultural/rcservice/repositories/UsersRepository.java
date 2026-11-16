@@ -1,4 +1,3 @@
-
 package com.rotacultural.rcservice.repositories;
 
 import com.rotacultural.rcservice.entities.Users;
@@ -15,7 +14,13 @@ public interface UsersRepository extends JpaRepository<Users, Long> {
 
     boolean existsByEmail(String email);
 
+    boolean existsByEmailIgnoreCase(String email);
+
     boolean existsByEmailAndIdUserNot(String email, Long idUser);
 
+    boolean existsByEmailIgnoreCaseAndIdUserNot(String email, Long idUser);
+
     Optional<Users> findByEmail(String email);
+
+    Optional<Users> findByEmailIgnoreCase(String email);
 }

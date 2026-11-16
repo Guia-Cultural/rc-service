@@ -5,6 +5,7 @@ import com.rotacultural.rcservice.entities.enums.Status;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -44,10 +45,8 @@ public class LocReq {
     @Size(max = 100)
     private String country;
 
-    @NotNull
     private BigDecimal latitude;
 
-    @NotNull
     private BigDecimal longitude;
 
     @NotBlank
@@ -57,10 +56,23 @@ public class LocReq {
     @NotNull
     private Price price;
 
-    @NotNull
-    @Positive
+    @PositiveOrZero
+    private BigDecimal estimatedCost;
+
+    @Size(max = 500)
+    private String coverImage;
+
+    @Size(max = 300)
+    private String officialWebsite;
+
+    @Size(max = 300)
+    private String ticketLink;
+
+    @Size(max = 150)
+    private String contact;
+
+    // Ignorados na criação/edição comum; mantidos por compatibilidade com clientes legados
     private Long userId;
 
-    @NotNull
     private Status status;
 }

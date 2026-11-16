@@ -2,7 +2,6 @@ package com.rotacultural.rcservice.controllers;
 
 import com.rotacultural.rcservice.dtos.trips.TripReq;
 import com.rotacultural.rcservice.services.TripsService;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,44 +17,33 @@ public class TripController {
     }
 
     @PostMapping
-    public ResponseEntity<?> create(@RequestBody @Valid TripReq tripReq){
-        try{
-            return ResponseEntity.status(HttpStatus.CREATED).body(tripsService.create(tripReq));
-        }catch(EntityNotFoundException e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
+    public ResponseEntity<?> create(@RequestBody @Valid TripReq tripReq) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(tripsService.create(tripReq));
     }
 
     @GetMapping
-    public ResponseEntity<?> readAll(){
+    public ResponseEntity<?> readAll() {
         return ResponseEntity.ok().body(tripsService.getAll());
     }
 
+    @GetMapping("/me")
+    public ResponseEntity<?> readMyTrips() {
+        return ResponseEntity.ok().body(tripsService.getMyTrips());
+    }
+
     @GetMapping("/{id}")
-    public ResponseEntity<?> readById(@PathVariable long id){
-        try {
-            return ResponseEntity.ok().body(tripsService.getById(id));
-        }catch (EntityNotFoundException e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
+    public ResponseEntity<?> readById(@PathVariable long id) {
+        return ResponseEntity.ok().body(tripsService.getById(id));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable long id, @RequestBody @Valid TripReq tripReq){
-        try {
-            return ResponseEntity.ok().body(tripsService.update(id, tripReq));
-        }catch (EntityNotFoundException e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
+    public ResponseEntity<?> update(@PathVariable long id, @RequestBody @Valid TripReq tripReq) {
+        return ResponseEntity.ok().body(tripsService.update(id, tripReq));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable long id){
-        try {
-            tripsService.delete(id);
-            return ResponseEntity.noContent().build();
-        }catch (EntityNotFoundException e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
+    public ResponseEntity<?> delete(@PathVariable long id) {
+        tripsService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }

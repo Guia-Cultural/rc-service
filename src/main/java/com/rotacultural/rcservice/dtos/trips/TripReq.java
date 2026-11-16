@@ -10,24 +10,27 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class TripReq {
-    private long userId;
+    private Long userId;
 
-    @NotBlank
+    @NotBlank(message = "Destino é obrigatório")
     @Size(max = 150)
     private String destination;
 
-    @NotNull
+    @NotNull(message = "Data inicial é obrigatória")
     private LocalDate startDate;
 
-    @NotNull
+    @NotNull(message = "Data final é obrigatória")
     private LocalDate endDate;
 
-    @NotNull
-    @PositiveOrZero
+    @NotNull(message = "Orçamento é obrigatório")
+    @PositiveOrZero(message = "Orçamento não pode ser negativo")
     private BigDecimal budget;
+
+    private List<Long> categoryIds;
 }

@@ -10,11 +10,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class FavReq {
-    @NotNull
-    @Positive
     private Long userId;
-    @NotNull
+
+    @NotNull(message = "Local é obrigatório")
     @Positive
     private Long locId;
-
 }

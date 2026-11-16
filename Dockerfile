@@ -27,8 +27,10 @@ FROM eclipse-temurin:25-jre-alpine AS runner
 
 WORKDIR /app
 
-# Cria usuário sem privilégios de root
-RUN addgroup -S app && adduser -S app -G app
+# Cria usuário sem privilégios de root e diretório de uploads
+RUN addgroup -S app && adduser -S app -G app \
+    && mkdir -p /app/uploads \
+    && chown -R app:app /app
 
 # Copia apenas o JAR compilado
 COPY --from=builder --chown=app:app \

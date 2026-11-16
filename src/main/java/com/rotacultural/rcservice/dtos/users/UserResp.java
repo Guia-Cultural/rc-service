@@ -16,6 +16,7 @@ public class UserResp {
     private String email;
     private String cep;
     private Role role;
+    private Boolean nativeRequested;
     private String bio;
     private LocalDateTime dateCreate;
 }

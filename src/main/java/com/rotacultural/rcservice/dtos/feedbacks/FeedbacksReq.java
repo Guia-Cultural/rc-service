@@ -9,15 +9,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class FeedbacksReq {
-    @NotNull
-    @Positive
     private Long userId;
 
-    @NotNull
+    @NotNull(message = "Local é obrigatório")
     @Positive
     private Long locId;
 
-    @NotNull
+    @NotNull(message = "Nota é obrigatória")
     @Min(0)
     @Max(5)
     private Double assessment;
