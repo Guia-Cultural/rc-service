@@ -10,3 +10,4 @@
 - PARCIAL: jornadas visuais; Computer Use bloqueou o navegador por não conseguir identificar URL Windows com confiança. Nenhum contorno.
 - Risco residual: firewall MySQL aceita serviços Azure de outras assinaturas; TLS/DML ativos, acesso /32 temporário removido. Egress estável restrito depende de avaliação de rede, sem recursos pagos extras criados.
 - Scripts versionados em deploy/. Express exige identidade atribuída + AZURE_CLIENT_ID. Segredos fora do Git e somente em memória/Container App Secrets.
+- Consolidação de revisão (sem deploy): integration/mvp-consolidado baseada em main, merge --no-ff do MVP e 12 testes novamente aprovados. Código preservado; detalhes em docs/BRANCH_CONSOLIDATION.md.
