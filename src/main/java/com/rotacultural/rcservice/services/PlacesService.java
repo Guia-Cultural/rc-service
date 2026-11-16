@@ -18,6 +18,8 @@ import com.rotacultural.rcservice.repositories.FeedbacksRepository;
 import com.rotacultural.rcservice.repositories.ItineraryRepository;
 import com.rotacultural.rcservice.repositories.PlaceImageRepository;
 import com.rotacultural.rcservice.repositories.PlacesRepository;
+import com.rotacultural.rcservice.services.storage.ImageFileValidator;
+import com.rotacultural.rcservice.services.storage.MediaAccessService;
 import com.rotacultural.rcservice.services.storage.StorageService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
@@ -49,6 +51,7 @@ public class PlacesService {
     private final ItineraryRepository itineraryRepository;
     private final AuthService authService;
     private final StorageService storageService;
+    private final MediaAccessService mediaAccessService;
 
     public PlacesService(
             PlacesRepository placesRepository,
@@ -58,7 +61,8 @@ public class PlacesService {
             FavoritesRepository favoritesRepository,
             ItineraryRepository itineraryRepository,
             AuthService authService,
-            StorageService storageService
+            StorageService storageService,
+            MediaAccessService mediaAccessService
     ) {
         this.placesRepository = placesRepository;
         this.categoriesRepository = categoriesRepository;
@@ -68,6 +72,7 @@ public class PlacesService {
         this.itineraryRepository = itineraryRepository;
         this.authService = authService;
         this.storageService = storageService;
+        this.mediaAccessService = mediaAccessService;
     }
 
     public LocResp create(LocReq req) {
@@ -236,36 +241,49 @@ public class PlacesService {
             );
         }
 
+        for (MultipartFile file : files) {
+            ImageFileValidator.validateImage(file);
+        }
+
         List<PlaceImageResp> uploaded = new ArrayList<>();
+        List<String> storedUrls = new ArrayList<>();
         boolean shouldMarkCover = cover || place.getCoverImage() == null || place.getCoverImage().isBlank();
 
-        for (int i = 0; i < files.size(); i++) {
-            MultipartFile file = files.get(i);
-            String url = storageService.store(file, "places/" + placeId);
+        try {
+            for (int i = 0; i < files.size(); i++) {
+                MultipartFile file = files.get(i);
+                String canonicalUrl = storageService.store(file, "places/" + placeId);
+                storedUrls.add(canonicalUrl);
 
-            boolean isFirstCover = shouldMarkCover && i == 0;
-            if (isFirstCover) {
-                List<PlaceImage> existingImages = placeImageRepository
-                        .findByPlace_IdLocOrderByCoverDescDateCreateAsc(placeId);
-                for (PlaceImage img : existingImages) {
-                    if (Boolean.TRUE.equals(img.getCover())) {
-                        img.setCover(false);
-                        placeImageRepository.save(img);
+                boolean isFirstCover = shouldMarkCover && i == 0;
+                if (isFirstCover) {
+                    List<PlaceImage> existingImages = placeImageRepository
+                            .findByPlace_IdLocOrderByCoverDescDateCreateAsc(placeId);
+                    for (PlaceImage img : existingImages) {
+                        if (Boolean.TRUE.equals(img.getCover())) {
+                            img.setCover(false);
+                            placeImageRepository.save(img);
+                        }
                     }
+                    place.setCoverImage(canonicalUrl);
+                    placesRepository.save(place);
                 }
-                place.setCoverImage(url);
-                placesRepository.save(place);
+
+                PlaceImage image = new PlaceImage();
+                image.setPlace(place);
+                image.setUrl(canonicalUrl);
+                image.setOriginalName(file.getOriginalFilename());
+                image.setContentType(file.getContentType());
+                image.setSizeBytes(file.getSize());
+                image.setCover(isFirstCover);
+
+                uploaded.add(toImageResponse(placeImageRepository.save(image), place.getStatus()));
             }
-
-            PlaceImage image = new PlaceImage();
-            image.setPlace(place);
-            image.setUrl(url);
-            image.setOriginalName(file.getOriginalFilename());
-            image.setContentType(file.getContentType());
-            image.setSizeBytes(file.getSize());
-            image.setCover(isFirstCover);
-
-            uploaded.add(toImageResponse(placeImageRepository.save(image)));
+        } catch (RuntimeException ex) {
+            for (String storedUrl : storedUrls) {
+                storageService.delete(storedUrl);
+            }
+            throw ex;
         }
 
         return uploaded;
@@ -277,7 +295,7 @@ public class PlacesService {
         ensureCanViewPlace(place);
         return placeImageRepository.findByPlace_IdLocOrderByCoverDescDateCreateAsc(placeId)
                 .stream()
-                .map(this::toImageResponse)
+                .map(image -> toImageResponse(image, place.getStatus()))
                 .toList();
     }
 
@@ -380,7 +398,7 @@ public class PlacesService {
         place.setPrice(req.getPrice());
         place.setEstimatedCost(req.getEstimatedCost());
         if (req.getCoverImage() != null && !req.getCoverImage().isBlank()) {
-            place.setCoverImage(req.getCoverImage().trim());
+            place.setCoverImage(ImageFileValidator.stripQuery(req.getCoverImage().trim()));
         }
         place.setOfficialWebsite(trimToNull(req.getOfficialWebsite()));
         place.setTicketLink(trimToNull(req.getTicketLink()));
@@ -450,7 +468,7 @@ public class PlacesService {
         response.setBusinessHours(place.getBusinessHours());
         response.setPrice(place.getPrice());
         response.setEstimatedCost(place.getEstimatedCost());
-        response.setCoverImage(place.getCoverImage());
+        response.setCoverImage(mediaAccessService.toAccessibleUrl(place.getCoverImage(), place.getStatus()));
         response.setOfficialWebsite(place.getOfficialWebsite());
         response.setTicketLink(place.getTicketLink());
         response.setContact(place.getContact());
@@ -463,7 +481,7 @@ public class PlacesService {
         List<PlaceImageResp> imageResps = placeImageRepository
                 .findByPlace_IdLocOrderByCoverDescDateCreateAsc(place.getIdLoc())
                 .stream()
-                .map(this::toImageResponse)
+                .map(image -> toImageResponse(image, place.getStatus()))
                 .toList();
         response.setImages(imageResps);
 
@@ -486,11 +504,11 @@ public class PlacesService {
         return response;
     }
 
-    private PlaceImageResp toImageResponse(PlaceImage image) {
+    private PlaceImageResp toImageResponse(PlaceImage image, Status placeStatus) {
         PlaceImageResp resp = new PlaceImageResp();
         resp.setId(image.getIdImage());
         resp.setPlaceId(image.getPlace().getIdLoc());
-        resp.setUrl(image.getUrl());
+        resp.setUrl(mediaAccessService.toAccessibleUrl(image.getUrl(), placeStatus));
         resp.setOriginalName(image.getOriginalName());
         resp.setContentType(image.getContentType());
         resp.setSizeBytes(image.getSizeBytes());

@@ -1,18 +1,27 @@
 package com.rotacultural.rcservice;
 
+import com.azure.core.util.BinaryData;
+import com.azure.storage.blob.BlobClient;
+import com.azure.storage.blob.BlobContainerClient;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rotacultural.rcservice.config.JwtConfig;
 import com.rotacultural.rcservice.entities.Categories;
 import com.rotacultural.rcservice.entities.Users;
 import com.rotacultural.rcservice.entities.enums.Role;
 import com.rotacultural.rcservice.repositories.CategoriesRepository;
 import com.rotacultural.rcservice.repositories.UsersRepository;
+import com.rotacultural.rcservice.services.storage.AzureBlobStorageService;
+import com.rotacultural.rcservice.services.storage.ImageFileValidator;
+import com.rotacultural.rcservice.services.storage.StoredResource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
+import org.springframework.mock.env.MockEnvironment;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.JwsHeader;
@@ -28,6 +37,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -301,7 +311,31 @@ class MvpIntegrationTests {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$[0].cover").value(true))
                 .andReturn();
-        Long imageId = objectMapper.readTree(uploadResult.getResponse().getContentAsString()).get(0).get("id").asLong();
+        JsonNode imageNode = objectMapper.readTree(uploadResult.getResponse().getContentAsString()).get(0);
+        Long imageId = imageNode.get("id").asLong();
+        String signedImageUrl = imageNode.get("url").asText();
+        String canonicalImageUrl = ImageFileValidator.stripQuery(signedImageUrl);
+
+        // Enquanto EM_AVALIACAO: acesso anônimo sem assinatura -> 403; com assinatura ou ADMIN -> 200
+        mockMvc.perform(get(canonicalImageUrl))
+                .andExpect(status().isForbidden());
+        mockMvc.perform(get(canonicalImageUrl + "?exp=1&sig=invalida"))
+                .andExpect(status().isForbidden());
+        mockMvc.perform(get(signedImageUrl))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.IMAGE_PNG));
+        mockMvc.perform(get(canonicalImageUrl)
+                        .header("Authorization", "Bearer " + adminToken))
+                .andExpect(status().isOk());
+
+        // Upload com conteúdo inválido disfarçado de PNG deve ser bloqueado (400)
+        MockMultipartFile invalidFile = new MockMultipartFile(
+                "files", "fake.png", "image/png", "not-an-image".getBytes()
+        );
+        mockMvc.perform(multipart("/places/" + placeId + "/images")
+                        .file(invalidFile)
+                        .header("Authorization", "Bearer " + nativoToken))
+                .andExpect(status().isBadRequest());
 
         // ADMIN aprova o local
         mockMvc.perform(patch("/places/" + placeId + "/status")
@@ -311,10 +345,33 @@ class MvpIntegrationTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("APROVADO"));
 
-        // Agora aparece na consulta pública e com filtro por cidade
+        // Local aprovado expõe foto pública sem necessidade de assinatura e aparece no catálogo
+        mockMvc.perform(get(canonicalImageUrl))
+                .andExpect(status().isOk());
         mockMvc.perform(get("/places").param("city", "Campinas"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[*].name", hasItem(placeName)));
+
+        // Rejeição de outro local mantém oculto da vitrine pública
+        String rejectedName = "Local Rejeitado Teste " + suffix;
+        MvcResult rejectedCreate = mockMvc.perform(post("/places")
+                        .header("Authorization", "Bearer " + nativoToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(createPlaceJson.replace(placeName, rejectedName)))
+                .andExpect(status().isCreated())
+                .andReturn();
+        Long rejectedId = objectMapper.readTree(rejectedCreate.getResponse().getContentAsString()).get("id").asLong();
+
+        mockMvc.perform(patch("/places/" + rejectedId + "/status")
+                        .header("Authorization", "Bearer " + adminToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"status\":\"REJEITADO\",\"rejectionReason\":\"Dados incompletos\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("REJEITADO"));
+
+        mockMvc.perform(get("/places"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[*].name", not(hasItem(rejectedName))));
 
         // Exclusão da imagem pelo dono
         mockMvc.perform(delete("/places/" + placeId + "/images/" + imageId)
@@ -450,6 +507,44 @@ class MvpIntegrationTests {
                                 """.formatted(salvadorPlaceId)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.assessment").value(5.0));
+    }
+
+    @Test
+    void healthProdSecretGuardAndAzureBlobServiceShouldWork() throws Exception {
+        mockMvc.perform(get("/health"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("UP"))
+                .andExpect(jsonPath("$.storageProvider").value("local"));
+
+        JwtConfig jwtConfig = new JwtConfig();
+        MockEnvironment prodEnv = new MockEnvironment().withProperty("dummy", "1");
+        prodEnv.setActiveProfiles("prod");
+        assertThatThrownBy(() -> jwtConfig.jwtSecretKey("", prodEnv))
+                .isInstanceOf(IllegalStateException.class);
+        assertThatThrownBy(() -> jwtConfig.jwtSecretKey(JwtConfig.DEV_DEFAULT_SECRET_BASE64, prodEnv))
+                .isInstanceOf(IllegalStateException.class);
+
+        // Valida AzureBlobStorageService armazenando referência canônica (sem URL SAS no banco)
+        BlobContainerClient containerClient = Mockito.mock(BlobContainerClient.class);
+        BlobClient blobClient = Mockito.mock(BlobClient.class);
+        Mockito.when(containerClient.exists()).thenReturn(true);
+        Mockito.when(containerClient.getBlobClient(Mockito.anyString())).thenReturn(blobClient);
+        Mockito.when(blobClient.exists()).thenReturn(true);
+        byte[] validPng = new byte[]{(byte) 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00, 0x00, 0x00, 0x0D};
+        Mockito.when(blobClient.downloadContent()).thenReturn(BinaryData.fromBytes(validPng));
+
+        AzureBlobStorageService azureStorage = new AzureBlobStorageService(containerClient);
+        MockMultipartFile file = new MockMultipartFile("files", "azure.png", "image/png", validPng);
+        String storedUrl = azureStorage.store(file, "places/99");
+        assertThat(storedUrl).startsWith("/uploads/places/99/").endsWith(".png");
+        assertThat(azureStorage.providerName()).isEqualTo("azure");
+
+        StoredResource loaded = azureStorage.load(storedUrl);
+        assertThat(loaded.content()).isEqualTo(validPng);
+        assertThat(loaded.contentType()).isEqualTo("image/png");
+
+        azureStorage.delete(storedUrl);
+        Mockito.verify(blobClient).deleteIfExists();
     }
 
     private String loginAndGetToken(String email, String password) throws Exception {

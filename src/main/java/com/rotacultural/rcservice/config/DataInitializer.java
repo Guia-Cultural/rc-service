@@ -11,6 +11,7 @@ import com.rotacultural.rcservice.repositories.CategoriesRepository;
 import com.rotacultural.rcservice.repositories.FeedbacksRepository;
 import com.rotacultural.rcservice.repositories.PlacesRepository;
 import com.rotacultural.rcservice.repositories.UsersRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -29,6 +30,21 @@ public class DataInitializer implements CommandLineRunner {
     private final FeedbacksRepository feedbacksRepository;
     private final PasswordEncoder passwordEncoder;
 
+    @Value("${app.seed.demo-users:false}")
+    private boolean seedDemoUsers;
+
+    @Value("${app.seed.demo-places:false}")
+    private boolean seedDemoPlaces;
+
+    @Value("${app.seed.categories:true}")
+    private boolean seedCategories;
+
+    @Value("${app.bootstrap.admin-email:}")
+    private String bootstrapAdminEmail;
+
+    @Value("${app.bootstrap.admin-password:}")
+    private String bootstrapAdminPassword;
+
     public DataInitializer(
             UsersRepository usersRepository,
             CategoriesRepository categoriesRepository,
@@ -46,6 +62,33 @@ public class DataInitializer implements CommandLineRunner {
     @Override
     @Transactional
     public void run(String... args) {
+        Map<String, Categories> categories = new HashMap<>();
+        if (seedCategories) {
+            categories.put("historia", ensureCategory("História & Patrimônio"));
+            categories.put("natureza", ensureCategory("Natureza & Ecoturismo"));
+            categories.put("gastronomia", ensureCategory("Gastronomia & Sabores"));
+            categories.put("arte", ensureCategory("Arte & Museus"));
+            categories.put("praias", ensureCategory("Praias & Litoral"));
+            categories.put("aventura", ensureCategory("Aventura & Trilhas"));
+            categories.put("urbano", ensureCategory("Vida Urbana & Cultura"));
+        }
+
+        if (bootstrapAdminEmail != null && !bootstrapAdminEmail.isBlank()
+                && bootstrapAdminPassword != null && !bootstrapAdminPassword.isBlank()) {
+            ensureUser(
+                    "Administrador Rota Cultural",
+                    bootstrapAdminEmail.trim(),
+                    bootstrapAdminPassword,
+                    null,
+                    Role.ADMIN,
+                    "Administrador inicial configurado por variável de ambiente."
+            );
+        }
+
+        if (!seedDemoUsers) {
+            return;
+        }
+
         Users admin = ensureUser(
                 "Administrador Rota Cultural",
                 "admin@rotacultural.com",
@@ -71,14 +114,9 @@ public class DataInitializer implements CommandLineRunner {
                 "Viajante explorando experiências culturais pelo Brasil."
         );
 
-        Map<String, Categories> categories = new HashMap<>();
-        categories.put("historia", ensureCategory("História & Patrimônio"));
-        categories.put("natureza", ensureCategory("Natureza & Ecoturismo"));
-        categories.put("gastronomia", ensureCategory("Gastronomia & Sabores"));
-        categories.put("arte", ensureCategory("Arte & Museus"));
-        categories.put("praias", ensureCategory("Praias & Litoral"));
-        categories.put("aventura", ensureCategory("Aventura & Trilhas"));
-        categories.put("urbano", ensureCategory("Vida Urbana & Cultura"));
+        if (!seedDemoPlaces || categories.isEmpty()) {
+            return;
+        }
 
         Places masp = ensurePlace(
                 "Museu de Arte de São Paulo (MASP)",

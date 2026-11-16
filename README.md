@@ -49,14 +49,19 @@ cp .env.example .env
 
 2. Preencha as variáveis conforme seu ambiente (**nunca versione `.env` nem chaves reais no Git**):
 
-| Variável | Descrição | Valor padrão / exemplo |
+| Variável | Descrição | Valor padrão (`dev`) / Produção (`prod`) |
 |---|---|---|
-| `DB_URL` | URL JDBC do MySQL | `jdbc:mysql://localhost:3306/rotacultural?createDatabaseIfNotExist=true` |
-| `DB_USERNAME` | Usuário do MySQL | `SEU_USUARIO` |
-| `DB_PASSWORD` | Senha do MySQL | `SUA_SENHA` |
-| `JWT_SECRET_BASE64` | Segredo HMAC SHA-256 em Base64 (>= 256 bits) | Ver `.env.example` (substituir em produção) |
-| `CORS_ALLOWED_ORIGINS` | Origens permitidas no CORS (separadas por vírgula) | `http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000` |
+| `SPRING_PROFILES_ACTIVE` | Profile Spring ativo | `dev` (padrão local) / `prod` (obrigatório na Azure) |
+| `DB_URL` | URL JDBC do MySQL 8.0 | Local `jdbc:mysql://localhost:3306/rotacultural...` / Obrigatório em `prod` |
+| `DB_USERNAME` | Usuário do MySQL | Obrigatório em `prod` |
+| `DB_PASSWORD` | Senha do MySQL | Obrigatório em `prod` |
+| `JWT_SECRET_BASE64` | Segredo HMAC SHA-256 em Base64 (>= 256 bits) | Fallback **apenas em `dev`/`test`**; rejeitado em `prod` se vazio ou padrão |
+| `CORS_ALLOWED_ORIGINS` | Origens permitidas no CORS (separadas por vírgula) | `http://localhost:5173,...` / URL HTTPS da Vercel em `prod` |
+| `APP_STORAGE_PROVIDER` | Provedor de mídia (`local` ou `azure`) | `local` em `dev` / `azure` em `prod` |
 | `UPLOAD_DIR` | Diretório físico para uploads locais | `./uploads` |
+| `AZURE_STORAGE_ACCOUNT_NAME` | Nome da Storage Account no Azure | Obrigatório quando `APP_STORAGE_PROVIDER=azure` |
+| `AZURE_STORAGE_CONTAINER_NAME` | Container privado do Blob | `places-media` |
+| `APP_BOOTSTRAP_ADMIN_EMAIL` / `PASSWORD` | Opcional para criar ADMIN inicial em `prod` | Vazio por padrão (nunca semeia `Senha@123` em `prod`) |
 
 ### Autenticação JWT (`JwtConfig`, `AuthService`, `AuthController`)
 
@@ -64,45 +69,34 @@ cp .env.example .env
   - emissor (`iss`): `rc-service`
   - expiração (`exp`): `86400` segundos (24h)
   - claims: `sub` (e-mail), `userId`, `email`, `name`, `role`
+- `JwtConfig` rejeita em `prod` qualquer chave vazia ou igual ao segredo padrão de desenvolvimento.
 - `GET /auth/me` e todos os endpoints protegidos recuperam o usuário autenticado exclusivamente a partir do token validado pelo `JwtDecoder` — nenhum `userId` enviado no corpo da requisição redefine propriedade de dados.
 
 ---
 
 ## Banco de Dados, Migrations e Seed Inicial
 
-- As definições SQL versionadas de referência estão em:
+- Scripts SQL compatíveis com **MySQL 8.0**:
   - `src/main/resources/db/migration/V1__baseline_schema.sql`
   - `src/main/resources/db/migration/V2__mvp_evolution.sql`
-- Em desenvolvimento local, o banco `rotacultural` é criado automaticamente (`createDatabaseIfNotExist=true`) e atualizado conforme configuração em `src/main/resources/application.properties`.
-- O componente `DataInitializer` executa um seed **idempotente** na inicialização quando os registros ainda não existem:
-  - **Usuários demonstrativos (senha padrão `Senha@123`):**
-    - `admin@rotacultural.com` (`ADMIN`)
-    - `nativo@rotacultural.com` (`NATIVO`)
-    - `usuario@rotacultural.com` (`USUARIO`)
-  - **Categorias:** 7 categorias culturais iniciais.
-  - **Locais:** 15 locais (`12` `APROVADO`, `2` `EM_AVALIACAO`, `1` `REJEITADO`) e avaliações iniciais.
+- **Desenvolvimento (`dev`):** usa `application-dev.properties` (`ddl-auto=update`), seed idempotente de categorias, 3 usuários demo (`admin@rotacultural.com`, `nativo@rotacultural.com`, `usuario@rotacultural.com`, senha `Senha@123`), 15 locais (`12` `APROVADO`, `2` `EM_AVALIACAO`, `1` `REJEITADO`) e avaliações iniciais.
+- **Produção (`prod`):** usa `application-prod.properties` (`ddl-auto=validate`, `spring.sql.init` com `V1` + `V2`, `app.seed.demo-users=false`, `app.seed.demo-places=false`, Swagger desabilitado por padrão).
 
 ---
 
-## Storage de Imagens (Local e Produção / Azure Blob)
+## Storage de Imagens (Local e Azure Blob Storage)
 
-- Upload via `POST /places/{id}/images` (`multipart/form-data`, campo `files`, parâmetro opcional `cover=true|false`).
-- Regras aplicadas em `FileSystemStorageService`:
-  - limite de `5 MB` por arquivo (`25 MB` por requisição configurado em `application.properties`);
+- Upload via `POST /places/{id}/images` (`multipart/form-data`, campo `files`, parâmetro opcional `cover=true|false`), com validação completa em `ImageFileValidator`:
+  - limite de `5 MB` por arquivo (`25 MB` por requisição) e até `10` imagens por local;
   - formatos aceitos: `.jpg`, `.jpeg`, `.png`, `.webp` validados por extensão, `Content-Type` e assinatura binária (magic bytes);
-  - nenhum arquivo é armazenado como Base64 no MySQL (apenas metadados e URL na tabela `place_images`).
-- Em desenvolvimento local, os arquivos são gravados em `UPLOAD_DIR` (`./uploads`) e expostos em `/uploads/**` via `WebConfig`.
-
-### O que falta configurar para produção (Azure Blob Storage)
-
-A interface `com.rotacultural.rcservice.services.storage.StorageService` (`store(MultipartFile file, String folder)` e `delete(String fileUrl)`) já isola os services da infraestrutura física. Para ativar **Azure Blob Storage** em produção:
-
-1. Adicionar a dependência oficial no `pom.xml` (ex.: `com.azure:azure-storage-blob` ou `com.azure.spring:spring-cloud-azure-starter-storage-blob`).
-2. Implementar uma classe `@Service` (ex.: `AzureBlobStorageService`) sob `@Profile("prod")` ou `@ConditionalOnProperty(name = "app.storage.provider", havingValue = "azure")`, marcando `FileSystemStorageService` para `local`/padrão.
-3. Configurar no ambiente de produção as credenciais do Storage Account (não versionadas no Git):
-   - `AZURE_STORAGE_CONNECTION_STRING` (ou `AZURE_STORAGE_ACCOUNT_NAME` + Managed Identity)
-   - `AZURE_STORAGE_CONTAINER_NAME` (ex.: `places-media`)
-   - `APP_STORAGE_PUBLIC_BASE_URL` (endpoint do Blob/CDN, caso o acesso não use SAS URL)
+  - rollback automático em falha parcial no lote para evitar arquivos órfãos;
+  - apenas chave canônica `/uploads/places/{id}/{uuid}.{ext}` e metadados vão ao MySQL (sem Base64 nem URLs SAS expiradas gravadas no banco).
+- Provedores sob a interface `StorageService`:
+  - **`FileSystemStorageService` (`app.storage.provider=local`):** padrão em `dev`/`test`, gravando em `UPLOAD_DIR`.
+  - **`AzureBlobStorageService` (`app.storage.provider=azure`):** padrão em `prod`, utilizando o SDK oficial `com.azure:azure-storage-blob` + `DefaultAzureCredential` (Managed Identity na Azure) em container **privado** (`places-media`).
+- **Controle de acesso na leitura (`MediaController`):**
+  - fotos de locais `APROVADO` são servidas publicamente via `GET /uploads/places/{placeId}/{filename}`;
+  - fotos de locais `EM_AVALIACAO` ou `REJEITADO` exigem assinatura HMAC temporária na resposta da API ou autenticação do criador/`ADMIN` (`403 Forbidden` para anônimos sem assinatura).
 
 ---
 
@@ -142,9 +136,9 @@ cd rc-service
 .\mvnw.cmd test
 ```
 
-Suites incluídas:
+Suites incluídas (`7` testes ao todo):
 - `RcServiceApplicationTests`: carregamento do contexto Spring Boot + JPA + Security.
-- `MvpIntegrationTests`: testes de integração reais cobrindo cadastro com bloqueio de `ADMIN`/solicitação segura de `NATIVO`, login JWT e hierarquia de papéis, fluxo de aprovação de locais + upload/validação de imagens, regra de 30 dias em viagens + recomendações determinísticas + geração de roteiros + bloqueio entre usuários, e favoritos + regra de 1 avaliação editável por usuário/local.
+- `MvpIntegrationTests`: cadastro com bloqueio de `ADMIN`/solicitação segura de `NATIVO`, login JWT e expiração, hierarquia e checagem de propriedade entre usuários, ciclo completo de locais + imagens protegidas enquanto `EM_AVALIACAO` + rejeição + aprovação, regra de 30 dias em viagens + recomendações determinísticas + roteiros + favoritos + avaliações, e validações de `/health`, guardião de chave JWT em `prod` e `AzureBlobStorageService`.
 
 ---
 
@@ -177,6 +171,7 @@ Hierarquia configurada no `SecurityConfig`: **`ADMIN > NATIVO > USUARIO`** (+ ac
 
 | Domínio | Endpoints principais |
 |---|---|
+| **Health & Mídia** | `GET /health`, `GET /uploads/places/{placeId}/{filename}` |
 | **Auth** | `POST /auth/login`, `GET /auth/me` |
 | **Usuários** | `POST /user`, `GET /user` (ADMIN), `GET /user/{id}`, `PUT /user/{id}`, `PATCH/PUT /user/{id}/role` (ADMIN), `DELETE /user/{id}` |
 | **Categorias** | `GET /categories`, `GET /categories/{id}`, `POST /categories` (ADMIN), `PUT /categories/{id}` (ADMIN), `DELETE /categories/{id}` (ADMIN) |
@@ -192,5 +187,5 @@ Hierarquia configurada no `SecurityConfig`: **`ADMIN > NATIVO > USUARIO`** (+ ac
 
 ## Status do MVP
 
-- **Concluído:** Autenticação JWT completa + BCrypt, hierarquia `ADMIN > NATIVO > USUARIO`, solicitação segura de `NATIVO`, CRUD completo e aprovação de locais, upload/serviço multipart de imagens em filesystem local, busca/filtros/paginação de locais aprovados, viagens (limite 30 dias), preferências, recomendações determinísticas com banco MySQL, geração/persistência de roteiros por dia, favoritos e avaliações (1 por usuário/local com edição), migrations SQL (`V1`/`V2`), seed idempotente e testes de integração.
-- **Pendente para Produção:** Implementação do provider **Azure Blob Storage** para `StorageService`, secrets gerenciados em cofre/provedor cloud e pipeline Flyway ativada caso opte por desligar `hibernate.ddl-auto`.
+- **Concluído no código:** Autenticação JWT + BCrypt, hierarquia `ADMIN > NATIVO > USUARIO`, profiles `dev`/`prod` (sem fallback de JWT nem senhas demo em `prod`, `ddl-auto=validate` + SQL `V1`/`V2` MySQL 8.0), `AzureBlobStorageService` (`DefaultAzureCredential` + container privado) e `FileSystemStorageService`, `MediaController` com URL assinada para fotos pendentes, busca/filtros/paginação de locais aprovados, viagens (limite 30 dias), preferências, recomendações determinísticas, roteiros, favoritos, avaliações, `/health` e testes integrados (`7/7`).
+- **Aguardando autorização/deploy (Etapa 9/10):** Provisionamento na Azure (Container Apps + ACR + MySQL Flexible Server + Storage Account) via `../deploy/azure-deploy.ps1` e validação em produção.
