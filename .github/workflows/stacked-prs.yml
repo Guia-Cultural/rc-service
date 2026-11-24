@@ -1,0 +1,37 @@
+# When a pull request is merged into main, mark as "ready for review" every
+# open draft pull request whose description contains the marker
+#   <!-- depends-on: #<number of the merged PR> -->
+# and leave a comment explaining why it left draft.
+name: Stacked PRs
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  promote-next:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Mark dependent draft PRs as ready for review
+        env:
+          GH_TOKEN: ${{ secrets.STACKED_PRS_TOKEN || github.token }}
+          REPO: ${{ github.repository }}
+          MERGED: ${{ github.event.pull_request.number }}
+        run: |
+          export MARKER="<!-- depends-on: #${MERGED} -->"
+          gh pr list --repo "$REPO" --state open --base main --limit 100 \
+            --json number,isDraft,body \
+            --jq '.[] | select(.isDraft) | select((.body // "") | contains(env.MARKER)) | .number' |
+          while read -r pr; do
+            if gh pr ready "$pr" --repo "$REPO"; then
+              gh pr comment "$pr" --repo "$REPO" --body "O #${MERGED} foi integrado na main, então este PR saiu do rascunho e já pode ser revisado."
+            else
+              gh pr comment "$pr" --repo "$REPO" --body "O #${MERGED} foi integrado na main. Não consegui tirar este PR do rascunho automaticamente; é só clicar em **Ready for review**."
+            fi
+          done
