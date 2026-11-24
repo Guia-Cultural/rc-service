@@ -1,6 +1,6 @@
 package com.rotacultural.rcservice.controllers;
 
-import com.rotacultural.rcservice.DTOs.Categories.CatReq;
+import com.rotacultural.rcservice.dtos.categories.CatReq;
 import com.rotacultural.rcservice.services.CategoryService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;

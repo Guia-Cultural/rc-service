@@ -11,6 +11,12 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
 
 @Entity
+@Table(
+        name = "feedbacks",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = {"idUser", "idLoc"})
+        }
+)
 @Getter
 @Setter
 @AllArgsConstructor
@@ -39,5 +45,4 @@ public class Feedbacks {
     @CreationTimestamp
     @Column(name = "date_create", nullable = false, updatable = false)
     private LocalDateTime dateCreate;
-
 }
