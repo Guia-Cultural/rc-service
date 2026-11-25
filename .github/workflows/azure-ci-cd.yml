@@ -1,0 +1,160 @@
+name: Rota Cultural — CI and Azure deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rc-service-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  test:
+    name: Verify Java and MySQL
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: rotacultural_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=15
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4.7.1
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: maven
+      - name: Maven verify (isolated test MySQL)
+        run: |
+          chmod +x mvnw
+          ./mvnw -B -ntp clean verify
+
+  deploy:
+    name: Publish image and update existing Azure Container App
+    needs: test
+    if: >-
+      github.event_name != 'pull_request' &&
+      github.ref == 'refs/heads/main' &&
+      vars.ENABLE_AZURE_DEPLOY == 'true'
+    runs-on: ubuntu-latest
+    environment: production
+    permissions:
+      contents: read
+      id-token: write
+    concurrency:
+      group: rc-service-azure-production
+      cancel-in-progress: false
+    env:
+      RESOURCE_GROUP: rg-rotacultural
+      CONTAINER_APP: rc-service-api
+      ACR_NAME: acrrotacultural26
+      IMAGE_REPOSITORY: rc-service
+    steps:
+      - name: Check Azure OIDC configuration
+        env:
+          AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+          AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+          AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+        run: |
+          set -euo pipefail
+          for key in AZURE_CLIENT_ID AZURE_TENANT_ID AZURE_SUBSCRIPTION_ID; do
+            if [ -z "${!key}" ]; then
+              echo "::error::Missing GitHub Actions variable: $key"
+              exit 1
+            fi
+          done
+          if [ "$AZURE_SUBSCRIPTION_ID" != "de7d7912-a0cf-438f-9a3a-e7c985dc794a" ]; then
+            echo "::error::Unexpected Azure subscription."
+            exit 1
+          fi
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4.7.1
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: maven
+      - name: Sign in to Azure via OIDC
+        uses: azure/login@a457da9ea143d694b1b9c7c869ebb04ebe844ef5 # v2.3.0
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      - name: Validate existing Azure resources (read-only)
+        shell: bash
+        run: |
+          set -euo pipefail
+          az account set --subscription "de7d7912-a0cf-438f-9a3a-e7c985dc794a"
+          az acr show -g "$RESOURCE_GROUP" -n "$ACR_NAME" --query 'name' -o tsv | grep -Fx "$ACR_NAME"
+          az containerapp show -g "$RESOURCE_GROUP" -n "$CONTAINER_APP" --query 'name' -o tsv | grep -Fx "$CONTAINER_APP"
+          current_identity="$(az containerapp show -g "$RESOURCE_GROUP" -n "$CONTAINER_APP" --query 'identity.type' -o tsv)"
+          case "$current_identity" in
+            *UserAssigned*) ;;
+            *) echo "::error::Unexpected Container App identity type"; exit 1 ;;
+          esac
+      - name: Build and push container image with Maven Jib
+        id: build
+        shell: bash
+        run: |
+          set -euo pipefail
+          auth_token="$(az acr login --name "$ACR_NAME" --expose-token --query accessToken -o tsv)"
+          if [ -z "$auth_token" ]; then echo "::error::No ACR access token"; exit 1; fi
+          export RC_ACR_USERNAME='00000000-0000-0000-0000-000000000000'
+          export RC_ACR_TOKEN="$auth_token"
+          trap 'unset RC_ACR_USERNAME RC_ACR_TOKEN auth_token' EXIT
+          chmod +x mvnw
+          ./mvnw -B -ntp -DskipTests compile jib:build
+          digest="$(tr -d '\r\n' < target/jib-image.digest)"
+          [[ "$digest" =~ ^sha256:[0-9a-f]{64}$ ]] || { echo "::error::Invalid image digest"; exit 1; }
+          remote="$(az acr manifest show-metadata --registry "$ACR_NAME" --name 'rc-service:mvp' --query digest -o tsv)"
+          [ "$remote" = "$digest" ] || { echo "::error::ACR digest mismatch"; exit 1; }
+          echo "image=${ACR_NAME}.azurecr.io/${IMAGE_REPOSITORY}@${digest}" >> "$GITHUB_OUTPUT"
+      - name: Update only the image of the existing Container App
+        shell: bash
+        env:
+          IMAGE: ${{ steps.build.outputs.image }}
+        run: |
+          set -euo pipefail
+          # This command must be validated against the existing Express environment
+          # before ENABLE_AZURE_DEPLOY is set to true. It does not recreate resources.
+          az containerapp update \
+            --resource-group "$RESOURCE_GROUP" \
+            --name "$CONTAINER_APP" \
+            --image "$IMAGE" \
+            --only-show-errors -o none
+      - name: Verify deployed revision and health
+        shell: bash
+        env:
+          IMAGE: ${{ steps.build.outputs.image }}
+        run: |
+          set -euo pipefail
+          observed="$(az containerapp show -g "$RESOURCE_GROUP" -n "$CONTAINER_APP" --query 'properties.template.containers[0].image' -o tsv)"
+          [ "$observed" = "$IMAGE" ] || { echo "::error::Unexpected deployed image"; exit 1; }
+          fqdn="$(az containerapp show -g "$RESOURCE_GROUP" -n "$CONTAINER_APP" --query 'properties.configuration.ingress.fqdn' -o tsv)"
+          [ -n "$fqdn" ] || { echo "::error::Missing application FQDN"; exit 1; }
+          healthy=0
+          for attempt in $(seq 1 18); do
+            if curl --fail --silent --show-error --max-time 20 "https://${fqdn}/health" | grep -q '"status":"UP"'; then
+              healthy=1
+              break
+            fi
+            sleep 10
+          done
+          [ "$healthy" -eq 1 ] || { echo "::error::Health verification failed"; exit 1; }
